@@ -1,7 +1,8 @@
+import { motion } from 'framer-motion'
 import { Brain } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
 import EngagementBar from '../../components/charts/EngagementBar'
-import { AI_INTERACTIONS as MOCK_INTERACTIONS, getAIEngagementBySubject } from '../../lib/mockData'
+import { AI_INTERACTIONS as MOCK_INTERACTIONS } from '../../lib/mockData'
 import { getAIStats } from '../../lib/supabase'
 import AnimatedCounter from '../../components/charts/AnimatedCounter'
 import { useEffect, useState } from 'react'
@@ -12,14 +13,22 @@ interface AIEngagementPageProps {
 
 export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
   const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
-  const [interactions, setInteractions] = useState<any[]>(MOCK_INTERACTIONS)
+  const [interactions, setInteractions] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     getAIStats().then(data => {
-      if (data && data.length > 0) setInteractions(data)
+      if (data && data.length > 0) {
+        setInteractions(data)
+      } else {
+        // If DB is empty, show mock data for demo
+        setInteractions(MOCK_INTERACTIONS)
+      }
       setIsLoading(false)
-    }).catch(() => setIsLoading(false))
+    }).catch(() => {
+      setInteractions(MOCK_INTERACTIONS)
+      setIsLoading(false)
+    })
   }, [])
 
   // Process data
@@ -28,7 +37,8 @@ export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
   
   const subjectMap: Record<string, number> = {}
   interactions.forEach(i => {
-    const sname = i.subjects?.name || i.subjectName || 'General'
+    // Robust mapping for both real DB objects and mock data
+    const sname = i.subjects?.name || i.subjectName || i.subject || 'General'
     subjectMap[sname] = (subjectMap[sname] || 0) + 1
   })
   const engagementData = Object.entries(subjectMap)

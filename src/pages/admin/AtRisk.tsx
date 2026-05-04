@@ -1,9 +1,10 @@
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { ShieldAlert, Download, ArrowUpDown } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
 import { AT_RISK_STUDENTS as MOCK_STUDENTS } from '../../lib/mockData'
 import { getAttendanceStatus, getStatusColor } from '../../lib/predictions'
 import { getAllAttendance } from '../../lib/supabase'
-import { useEffect } from 'react'
 
 interface AtRiskPageProps {
   onLogout: () => void
@@ -18,11 +19,6 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
 
   useEffect(() => {
     getAllAttendance().then(records => {
-      if (!records || records.length === 0) {
-        setIsLoading(false)
-        return
-      }
-
       // Group by Student + Subject
       const riskMap: Record<string, any> = {}
       records.forEach(r => {
@@ -46,9 +42,12 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
         .map(s => ({ ...s, attendance: Math.round((s.attended / s.total) * 100) }))
         .filter(s => s.attendance < 75)
 
-      if (realRisk.length > 0) setStudents(realRisk)
+      setStudents(realRisk.length > 0 ? realRisk : MOCK_STUDENTS)
       setIsLoading(false)
-    }).catch(() => setIsLoading(false))
+    }).catch(() => {
+      setStudents(MOCK_STUDENTS)
+      setIsLoading(false)
+    })
   }, [])
 
   const sorted = [...students].sort((a, b) => {

@@ -18,7 +18,6 @@
     /* Linting - relaxed for hackathon speed */
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "erasableSyntaxOnly": false,
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"]

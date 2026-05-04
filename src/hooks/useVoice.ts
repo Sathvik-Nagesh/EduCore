@@ -29,7 +29,7 @@ export function useVoice(): UseSpeechRecognitionReturn {
 
     recognition.onstart = () => setIsListening(true)
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       let finalTranscript = ''
       let interimTranscript = ''
 
