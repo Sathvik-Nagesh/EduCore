@@ -106,8 +106,7 @@ export function generateTimetable(
         const slotEnd = minutesToTime(timeToMinutes(slot) + classDuration)
 
         const conflict = grid[day].some(
-          s => s.facultyId === faculty.id &&
-            timeToMinutes(s.startTime) < timeToMinutes(slotEnd) &&
+          s => timeToMinutes(s.startTime) < timeToMinutes(slotEnd) &&
             timeToMinutes(s.endTime) > timeToMinutes(slot)
         )
 

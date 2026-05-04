@@ -10,9 +10,9 @@ const COLORS = ['#4F8EF7', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899']
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="card px-4 py-3 text-sm">
-        <p className="text-white/60 mb-1">{label}</p>
-        <p className="font-semibold text-white">{payload[0].value} AI queries</p>
+      <div className="card px-4 py-3 text-sm border-navy-100 shadow-xl">
+        <p className="text-navy-400 font-bold mb-1">{label}</p>
+        <p className="font-black text-navy-800">{payload[0].value} AI queries</p>
       </div>
     )
   }

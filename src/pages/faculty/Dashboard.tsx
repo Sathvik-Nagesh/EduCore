@@ -70,13 +70,15 @@ export default function FacultyDashboard({ onLogout }: Props) {
           const Icon = k.icon
           return (
             <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.07 }} className="card p-5">
+              transition={{ delay: i * 0.07 }} className="card p-5 hover:shadow-card-hover group">
               <div className="flex items-center gap-2 mb-2">
-                <Icon className="w-4 h-4" style={{ color: k.color }} />
-                <span className="text-xs text-white/40">{k.label}</span>
+                <div className="p-2 rounded-lg" style={{ background: `${k.color}10` }}>
+                  <Icon className="w-4 h-4" style={{ color: k.color }} />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-navy-400">{k.label}</span>
               </div>
-              <div className="font-heading text-3xl font-black text-white">
-                <AnimatedCounter value={k.value} /><span className="text-base text-white/30">{k.unit}</span>
+              <div className="font-heading text-3xl font-black text-navy-800">
+                <AnimatedCounter value={k.value} /><span className="text-base text-navy-200 ml-1">{k.unit}</span>
               </div>
             </motion.div>
           )
@@ -87,30 +89,30 @@ export default function FacultyDashboard({ onLogout }: Props) {
 
         {/* ── Radar: Subject Engagement ──────────────────────────── */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }} className="card p-5 lg:col-span-2">
-          <h3 className="font-heading text-sm font-semibold text-white mb-1">Subject Engagement Radar</h3>
-          <p className="text-xs text-white/30 mb-4">DBMS vs OS across 5 dimensions</p>
+          transition={{ delay: 0.1 }} className="card p-6 lg:col-span-2">
+          <h3 className="font-heading text-lg font-bold text-navy-800 mb-1">Subject Engagement Radar</h3>
+          <p className="text-xs text-navy-400 font-medium mb-4">DBMS vs OS across 5 dimensions</p>
           <ResponsiveContainer width="100%" height={220}>
             <RadarChart data={RADAR_DATA} cx="50%" cy="50%" outerRadius={80}>
-              <PolarGrid stroke="rgba(255,255,255,0.06)" />
+              <PolarGrid stroke="rgba(0,0,0,0.06)" />
               <PolarAngleAxis dataKey="metric"
-                tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} />
+                tick={{ fill: 'rgba(0,0,0,0.45)', fontSize: 10, fontWeight: 600 }} />
               <Radar name="DBMS" dataKey="DBMS" stroke="#10B981" fill="#10B981" fillOpacity={0.25} strokeWidth={2} />
-              <Radar name="OS"   dataKey="OS"   stroke="#4F8EF7" fill="#4F8EF7" fillOpacity={0.15} strokeWidth={2} />
+              <Radar name="OS"   dataKey="OS"   stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.15} strokeWidth={2} />
               <Tooltip content={<CustomTooltip unit="" />} />
             </RadarChart>
           </ResponsiveContainer>
           <div className="flex gap-4 justify-center mt-1">
-            <div className="flex items-center gap-1.5 text-xs text-white/40"><div className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />DBMS</div>
-            <div className="flex items-center gap-1.5 text-xs text-white/40"><div className="w-2.5 h-2.5 rounded-sm bg-electric-blue" />OS</div>
+            <div className="flex items-center gap-1.5 text-xs text-navy-400 font-bold"><div className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />DBMS</div>
+            <div className="flex items-center gap-1.5 text-xs text-navy-400 font-bold"><div className="w-2.5 h-2.5 rounded-sm bg-blue-500" />OS</div>
           </div>
         </motion.div>
 
         {/* ── Section Attendance Bars ────────────────────────────── */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.15 }} className="card p-5 lg:col-span-3">
-          <h3 className="font-heading text-sm font-semibold text-white mb-1">Section Attendance</h3>
-          <p className="text-xs text-white/30 mb-4">Attendance % across your sections</p>
+          transition={{ delay: 0.15 }} className="card p-6 lg:col-span-3">
+          <h3 className="font-heading text-lg font-bold text-navy-800 mb-1">Section Attendance</h3>
+          <p className="text-xs text-navy-400 font-medium mb-4">Attendance % across your sections</p>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={sectionData} layout="vertical" margin={{ left: 0, right: 16, top: 4, bottom: 0 }}>
               <CartesianGrid {...GRID_STYLE} horizontal={false} />
@@ -125,8 +127,8 @@ export default function FacultyDashboard({ onLogout }: Props) {
             </BarChart>
           </ResponsiveContainer>
           {/* 75% marker */}
-          <div className="flex items-center gap-2 mt-2 text-xs text-amber-400/60">
-            <div className="w-3 h-0.5 border-t border-dashed border-amber-400" />
+          <div className="flex items-center gap-2 mt-2 text-xs text-amber-600 font-bold">
+            <div className="w-3 h-0.5 border-t border-dashed border-amber-600" />
             75% threshold
           </div>
         </motion.div>
@@ -135,22 +137,22 @@ export default function FacultyDashboard({ onLogout }: Props) {
       {/* ── Today's Schedule + Leave Status ──────────────────────── */}
       <div className="grid md:grid-cols-2 gap-4">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }} className="card p-5">
-          <h3 className="font-heading text-sm font-semibold text-white mb-3">Today's Classes</h3>
+          transition={{ delay: 0.2 }} className="card p-6">
+          <h3 className="font-heading text-lg font-bold text-navy-800 mb-3">Today's Classes</h3>
           {timetable.slice(0, 3).length === 0 ? (
-            <p className="text-white/30 text-sm">No classes data — connect DB for live schedule</p>
+            <p className="text-navy-400 text-sm font-medium">No classes data — connect DB for live schedule</p>
           ) : (
             <div className="space-y-2">
               {timetable.slice(0, 3).map((slot: any, i: number) => {
                 const code = slot.subjects?.code || 'SUB'
                 const color = SUBJECT_COLOR_MAP[code] || '#4F8EF7'
                 return (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl"
-                    style={{ background: `${color}12`, border: `1px solid ${color}25` }}>
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border"
+                    style={{ background: `${color}08`, borderColor: `${color}20` }}>
                     <div className="w-2 h-8 rounded-full flex-shrink-0" style={{ background: color }} />
                     <div>
-                      <p className="text-white text-sm font-semibold">{slot.subjects?.name || code}</p>
-                      <p className="text-white/40 text-xs">{slot.start_time.slice(0,5)} – {slot.end_time.slice(0,5)} · {slot.room}</p>
+                      <p className="text-navy-800 text-sm font-bold">{slot.subjects?.name || code}</p>
+                      <p className="text-navy-400 text-xs font-medium">{slot.start_time.slice(0,5)} – {slot.end_time.slice(0,5)} · {slot.room}</p>
                     </div>
                   </div>
                 )
@@ -162,8 +164,8 @@ export default function FacultyDashboard({ onLogout }: Props) {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }} className="card p-5">
-          <h3 className="font-heading text-sm font-semibold text-white mb-3">Quick Actions</h3>
+          transition={{ delay: 0.25 }} className="card p-6">
+          <h3 className="font-heading text-lg font-bold text-navy-800 mb-3">Quick Actions</h3>
           <div className="space-y-2">
             {[
               { label: 'Mark Attendance', sub: 'Record today\'s class', path: '/faculty/attendance', color: '#10B981' },
@@ -171,11 +173,11 @@ export default function FacultyDashboard({ onLogout }: Props) {
               { label: 'Upload Material',  sub: 'Share notes with students', path: '/faculty/upload', color: '#8B5CF6' },
             ].map((a, i) => (
               <button key={i} onClick={() => navigate(a.path)}
-                className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all hover:bg-white/[0.04] border border-transparent hover:border-white/8">
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: a.color }} />
+                className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all hover:bg-navy-50 border border-transparent hover:border-navy-100 group shadow-sm">
+                <div className="w-2 h-2 rounded-full flex-shrink-0 group-hover:scale-125 transition-transform" style={{ background: a.color }} />
                 <div>
-                  <p className="text-sm font-semibold text-white">{a.label}</p>
-                  <p className="text-xs text-white/35">{a.sub}</p>
+                  <p className="text-sm font-bold text-navy-800">{a.label}</p>
+                  <p className="text-xs text-navy-400 font-medium">{a.sub}</p>
                 </div>
               </button>
             ))}

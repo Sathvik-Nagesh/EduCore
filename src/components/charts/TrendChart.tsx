@@ -8,9 +8,9 @@ interface TrendChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="card px-4 py-3 text-sm">
-        <p className="text-white/60 mb-1">{label}</p>
-        <p className="text-electric-blue font-semibold">{payload[0].value}% attendance</p>
+      <div className="card px-4 py-3 text-sm border-navy-100 shadow-xl">
+        <p className="text-navy-400 font-bold mb-1">{label}</p>
+        <p className="text-blue-600 font-black">{payload[0].value}% attendance</p>
       </div>
     )
   }
@@ -29,17 +29,17 @@ export default function TrendChart({ data, height = 200 }: TrendChartProps) {
             <stop offset="95%" stopColor="#4F8EF7" stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
         <XAxis
           dataKey="date"
-          tick={{ fill: '#5A6479', fontSize: 11 }}
+          tick={{ fill: '#718096', fontSize: 11, fontWeight: 700 }}
           tickLine={false}
           axisLine={false}
           interval={4}
         />
         <YAxis
           domain={[40, 100]}
-          tick={{ fill: '#5A6479', fontSize: 11 }}
+          tick={{ fill: '#718096', fontSize: 11, fontWeight: 700 }}
           tickLine={false}
           axisLine={false}
         />

@@ -48,12 +48,12 @@ export default function AttendancePage({ onLogout }: AttendancePageProps) {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-heading font-bold text-white text-lg">{subject.code}</span>
+                      <span className="font-heading font-black text-slate-800 text-lg uppercase tracking-tight">{subject.code}</span>
                       <span className={`badge-${subject.status}`}>
                         {subject.status === 'safe' ? '🟢' : subject.status === 'warning' ? '🟡' : '🔴'} {subject.status}
                       </span>
                     </div>
-                    <p className="text-white/40 text-xs mt-0.5">{subject.subjectName}</p>
+                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-0.5">{subject.subjectName}</p>
                   </div>
                   <span className="font-heading text-3xl font-bold" style={{ color }}>
                     <AnimatedCounter value={subject.percentage} suffix="%" decimals={1} />
@@ -61,7 +61,7 @@ export default function AttendancePage({ onLogout }: AttendancePageProps) {
                 </div>
 
                 {/* Progress bar */}
-                <div className="h-2 rounded-full bg-white/10 mb-4">
+                <div className="h-2 rounded-full bg-slate-100 mb-4">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ background: color }}
@@ -72,35 +72,35 @@ export default function AttendancePage({ onLogout }: AttendancePageProps) {
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="text-center p-3 rounded-xl bg-white/3">
-                    <div className="font-semibold text-white">{subject.attended}</div>
-                    <div className="text-xs text-white/30">Attended</div>
+                  <div className="text-center p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="font-black text-slate-900">{subject.attended}</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Attended</div>
                   </div>
-                  <div className="text-center p-3 rounded-xl bg-white/3">
-                    <div className="font-semibold text-white">{subject.total}</div>
-                    <div className="text-xs text-white/30">Total</div>
+                  <div className="text-center p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="font-black text-slate-900">{subject.total}</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</div>
                   </div>
-                  <div className="text-center p-3 rounded-xl bg-white/3">
-                    <div className="font-semibold text-white">{subject.total - subject.attended}</div>
-                    <div className="text-xs text-white/30">Absent</div>
+                  <div className="text-center p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="font-black text-slate-900">{subject.total - subject.attended}</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Absent</div>
                   </div>
                 </div>
 
                 {/* Prediction */}
-                <div className="rounded-xl p-3 text-xs" style={{ background: `${color}10`, border: `1px solid ${color}20` }}>
-                  <p className="text-white/70">{subject.prediction}</p>
+                <div className="rounded-xl p-3 text-xs" style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
+                  <p className="text-slate-600 font-bold">{subject.prediction}</p>
                 </div>
 
                 {/* Action stats */}
                 <div className="flex gap-3 mt-3">
                   {subject.status === 'safe' && skippable > 0 && (
-                    <div className="flex items-center gap-1.5 text-xs text-emerald-400">
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold">
                       <Shield className="w-3 h-3" />
                       Can skip {skippable} more class{skippable !== 1 ? 'es' : ''}
                     </div>
                   )}
                   {subject.status !== 'safe' && needed > 0 && (
-                    <div className="flex items-center gap-1.5 text-xs text-amber-400">
+                    <div className="flex items-center gap-1.5 text-xs text-amber-600 font-bold">
                       <TrendingUp className="w-3 h-3" />
                       Need {needed} consecutive classes to reach 75%
                     </div>

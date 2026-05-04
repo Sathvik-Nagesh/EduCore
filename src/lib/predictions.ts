@@ -80,9 +80,9 @@ export function generatePredictionMessage(
 }
 
 export function getMotivationalMessage(percentage: number): string {
-  if (percentage >= 90) return "🏆 Outstanding! You're a star student — keep it up!"
-  if (percentage >= 80) return "✨ Great attendance! You're on track for success."
-  if (percentage >= 75) return "✅ You're within safe limits. Stay consistent!"
-  if (percentage >= 65) return "⚠️ You're in the warning zone. Don't miss any more classes!"
-  return "🔴 Critical! Your attendance needs immediate attention. Attend every class."
+  if (percentage >= 90) return "🏆 Outstanding performance! You're among the top 5% of students."
+  if (percentage >= 80) return "✨ Excellent attendance. Keep maintaining this consistency!"
+  if (percentage >= 75) return "✅ You are currently safe, but don't let your guard down."
+  if (percentage >= 65) return "⚠️ WARNING ZONE: You're close to detention. Attend every class from now on!"
+  return "🔴 CRITICAL ALERT: Attendance below 65%. Immediate recovery required!"
 }

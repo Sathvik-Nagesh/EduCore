@@ -9,18 +9,18 @@
    ============================================ */
 
 :root {
-  --navy: #090A0F;
-  --charcoal: #12141D;
+  --navy: #F8FAFC;
+  --charcoal: #FFFFFF;
   --electric-blue: #3B82F6;
   --amber: #F59E0B;
   --emerald: #10B981;
   --danger: #EF4444;
-  --surface: #1A1D27;
-  --surface-raised: #222634;
-  --border: rgba(255, 255, 255, 0.08);
-  --text-primary: #F0F4FF;
-  --text-secondary: #8892AA;
-  --text-muted: #5A6479;
+  --surface: #FFFFFF;
+  --surface-raised: #F1F5F9;
+  --border: rgba(0, 0, 0, 0.08);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
 }
 
 * {
@@ -54,16 +54,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--charcoal);
+  background: var(--navy);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(79, 142, 247, 0.4);
+  background: rgba(59, 130, 246, 0.3);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(79, 142, 247, 0.7);
+  background: rgba(59, 130, 246, 0.4);
 }
 
 /* ============================================
@@ -129,7 +129,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.03);
   color: var(--text-secondary);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
@@ -141,9 +141,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.05);
   color: var(--text-primary);
-  border-color: rgba(79, 142, 247, 0.3);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 /* ============================================
@@ -217,9 +217,9 @@ h1, h2, h3, h4, h5, h6 {
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.03) 25%,
-    rgba(255, 255, 255, 0.07) 50%,
-    rgba(255, 255, 255, 0.03) 75%
+    rgba(0, 0, 0, 0.03) 25%,
+    rgba(0, 0, 0, 0.07) 50%,
+    rgba(0, 0, 0, 0.03) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -245,7 +245,7 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .input-field {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.02);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   color: var(--text-primary);
@@ -287,13 +287,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .data-table td {
   padding: 0.875rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   color: var(--text-primary);
   font-size: 0.875rem;
 }
 
 .data-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.015);
 }
 
 /* ============================================
@@ -315,7 +315,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.04);
   color: var(--text-primary);
 }
 
@@ -364,7 +364,7 @@ h1, h2, h3, h4, h5, h6 {
 .toggle-track {
   width: 40px;
   height: 22px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 11px;
   transition: background 0.2s ease;
   position: relative;
@@ -404,7 +404,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .chat-bubble-ai {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.03);
   border: 1px solid var(--border);
   border-radius: 1rem 1rem 1rem 0.25rem;
   padding: 0.75rem 1rem;

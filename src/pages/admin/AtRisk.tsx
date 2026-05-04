@@ -52,16 +52,16 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
         {[
           { label: 'Below 65%', count: AT_RISK_STUDENTS.filter(s => s.attendance < 65).length, color: '#EF4444' },
           { label: '65–74%', count: AT_RISK_STUDENTS.filter(s => s.attendance >= 65 && s.attendance < 75).length, color: '#F59E0B' },
-          { label: 'Total At-Risk', count: AT_RISK_STUDENTS.length, color: '#8B5CF6' },
+          { label: 'Total At-Risk', count: AT_RISK_STUDENTS.length, color: '#2563EB' },
         ].map(stat => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="card p-5"
+            className="card p-5 border-slate-100 shadow-sm"
           >
-            <div className="font-heading text-3xl font-bold" style={{ color: stat.color }}>{stat.count}</div>
-            <div className="text-white/40 text-xs mt-1">{stat.label}</div>
+            <div className="font-heading text-3xl font-black" style={{ color: stat.color }}>{stat.count}</div>
+            <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">{stat.label}</div>
           </motion.div>
         ))}
       </div>
@@ -70,14 +70,14 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
       <div className="card p-6">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-red-400" />
-            <h2 className="font-heading text-base font-semibold text-white">At-Risk Student List</h2>
+            <ShieldAlert className="w-5 h-5 text-red-500" />
+            <h2 className="font-heading text-lg font-bold text-slate-800">At-Risk Student List</h2>
           </div>
           <button
             onClick={exportCSV}
-            className="btn-ghost text-sm flex items-center gap-2"
+            className="text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 border border-slate-200 shadow-sm"
           >
-            <Download className="w-4 h-4" /> Export CSV
+            <Download className="w-3.5 h-3.5" /> Export CSV
           </button>
         </div>
 
@@ -114,24 +114,24 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
                     transition={{ delay: i * 0.05 }}
                   >
                     <td>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <div
-                          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold text-white"
-                          style={{ background: `${color}20` }}
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black shadow-sm"
+                          style={{ background: `${color}15`, color: color, border: `1px solid ${color}30` }}
                         >
                           {student.name.charAt(0)}
                         </div>
-                        <span className="font-medium text-white">{student.name}</span>
+                        <span className="font-bold text-slate-800">{student.name}</span>
                       </div>
                     </td>
-                    <td className="text-white/60">{student.subject}</td>
+                    <td className="text-slate-500 font-bold text-xs">{student.subject}</td>
                     <td>
-                      <span className="font-heading font-bold" style={{ color }}>
+                      <span className="font-heading font-black text-lg" style={{ color }}>
                         {student.attendance}%
                       </span>
                     </td>
-                    <td className="text-white/50">{student.department}</td>
-                    <td className="text-white/40 text-xs">{student.rollNo}</td>
+                    <td className="text-slate-500 font-bold text-xs">{student.department}</td>
+                    <td className="text-slate-300 font-bold text-[10px] uppercase tracking-wider">{student.rollNo}</td>
                     <td>
                       <span className={status === 'danger' ? 'badge-danger' : 'badge-warning'}>
                         {status === 'danger' ? '🔴' : '🟡'} {status === 'danger' ? 'Danger' : 'Warning'}

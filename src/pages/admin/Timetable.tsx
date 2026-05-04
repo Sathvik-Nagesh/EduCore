@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Trash2, Zap, Download, AlertCircle, Calendar, CalendarDays, Sun } from 'lucide-react'
+import { Plus, Trash2, Zap, Download, AlertCircle, Calendar, CalendarDays, Sun, MapPin, Settings2, Users } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
 import { generateTimetable, detectConflicts } from '../../lib/timetable'
 import type { FacultyConstraint, TimetableGrid } from '../../lib/timetable'
@@ -17,7 +17,7 @@ const SHORT_DAYS: Record<string, string> = {
 }
 
 const PRESET_FACULTIES: FacultyConstraint[] = [
-  { id: 'f1', name: 'Dr. Priya Sharma',  subjects: ['DBMS', 'OS'],  maxHoursPerWeek: 12, color: '#4F8EF7' },
+  { id: 'f1', name: 'Dr. Priya Sharma',  subjects: ['DBMS', 'OS'],  maxHoursPerWeek: 12, color: '#3B82F6' },
   { id: 'f2', name: 'Prof. Rahul Mehta', subjects: ['DSA', 'ML'],   maxHoursPerWeek: 10, color: '#10B981' },
   { id: 'f3', name: 'Dr. Anita Rao',     subjects: ['CN'],           maxHoursPerWeek: 8,  color: '#F59E0B' },
 ]
@@ -35,7 +35,7 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
   const [endTime, setEndTime] = useState('17:00')
   const [duration, setDuration] = useState(60)
   const [activeDays, setActiveDays] = useState<string[]>(['Monday','Tuesday','Wednesday','Thursday','Friday'])
-  const [halfDays, setHalfDays] = useState<string[]>([])   // e.g. ['Saturday']
+  const [halfDays, setHalfDays] = useState<string[]>([])
   const [halfDayEnd, setHalfDayEnd] = useState('13:00')
 
   // View & generation state
@@ -57,7 +57,6 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
   // ── Day Toggles ───────────────────────────────────────────────────────────
   const toggleDay = (day: string) => {
     setActiveDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day])
-    // Remove from half days if deactivated
     setHalfDays(prev => prev.filter(d => d !== day))
   }
 
@@ -70,9 +69,8 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
   const handleGenerate = async () => {
     if (activeDays.length === 0) { toast.error('Select at least one active day'); return }
     setGenerating(true)
-    await new Promise(res => setTimeout(res, 900))
+    await new Promise(res => setTimeout(res, 1200))
 
-    // Build day-specific end times (half days get halfDayEnd)
     const dayEndTimes: Record<string, string> = {}
     for (const day of activeDays) {
       dayEndTimes[day] = halfDays.includes(day) ? halfDayEnd : endTime
@@ -86,313 +84,338 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
     setSelectedDay(activeDays[0] || 'Monday')
 
     detected.length === 0
-      ? toast.success('Timetable generated — no conflicts! 🎉')
+      ? toast.success('Timetable generated successfully!')
       : toast.error(`Generated with ${detected.length} conflict(s)`)
   }
 
   // ── Export ────────────────────────────────────────────────────────────────
   const handleExport = () => {
     if (!timetable) return
-    let text = 'EduCore Timetable\n\n'
-    const days = activeDays.length ? activeDays : ALL_DAYS
-    for (const day of days) {
+    let text = 'EduCore Smart Timetable\n' + '='.repeat(30) + '\n\n'
+    activeDays.forEach(day => {
       const slots = timetable[day] || []
-      if (!slots.length) continue
-      text += `${day}${halfDays.includes(day) ? ' (Half Day)' : ''}:\n`
-      slots.forEach(s => { text += `  ${s.startTime}-${s.endTime}: ${s.subject} (${s.faculty}, ${s.room})\n` })
+      text += `[ ${day.toUpperCase()}${halfDays.includes(day) ? ' - HALF DAY' : ''} ]\n`
+      slots.forEach(s => {
+        text += `  ${s.startTime} - ${s.endTime} | ${s.subject.padEnd(10)} | ${s.faculty.padEnd(15)} | Room: ${s.room}\n`
+      })
+      if (slots.length === 0) text += '  No classes scheduled\n'
       text += '\n'
-    }
+    })
     const blob = new Blob([text], { type: 'text/plain' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = 'timetable.txt'
+    a.download = `timetable_${new Date().toISOString().split('T')[0]}.txt`
     a.click()
     toast.success('Timetable exported!')
   }
 
-  // ── Render days in grid ───────────────────────────────────────────────────
-  const displayDays = viewMode === 'day' ? [selectedDay] : activeDays
+  const timeSlots = (() => {
+    const slots = []
+    const startMin = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1])
+    const endMin = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1])
+    for (let t = startMin; t + duration <= endMin; t += duration) {
+      const h = Math.floor(t / 60)
+      const m = t % 60
+      const endH = Math.floor((t + duration) / 60)
+      const endM = (t + duration) % 60
+      slots.push({
+        start: `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`,
+        end: `${endH.toString().padStart(2, '0')}:${endM.toString().padStart(2, '0')}`
+      })
+    }
+    return slots
+  })()
 
   return (
     <PageWrapper role="admin" userName={user.name || 'Admin'} onLogout={onLogout}
-      title="Timetable Generator" subtitle="Constraint-based smart timetable with day & half-day support">
-      <div className="grid xl:grid-cols-5 gap-6">
-
-        {/* ── LEFT PANEL ─────────────────────────────────────────────────── */}
-        <div className="xl:col-span-2 space-y-4">
-
-          {/* Duration & Time */}
-          <div className="card p-5 space-y-4">
-            <h3 className="font-heading text-sm font-semibold text-white">Schedule Settings</h3>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="section-label mb-1 block">Start Time</label>
-                <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="input-field text-sm" />
-              </div>
-              <div>
-                <label className="section-label mb-1 block">Full Day End</label>
-                <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="input-field text-sm" />
-              </div>
+      title="Timetable Studio" subtitle="Generate high-performance schedules with automated conflict resolution">
+      
+      <div className="flex flex-col lg:flex-row gap-6">
+        
+        {/* ── Configuration Sidebar (Sticky) ────────────────────────────── */}
+        <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 space-y-6">
+          
+          {/* Settings Group */}
+          <div className="card p-6 border-slate-200/60 shadow-sm">
+            <div className="flex items-center gap-2 mb-6 text-slate-800">
+              <Settings2 className="w-5 h-5 text-blue-600" />
+              <h3 className="font-heading font-black text-sm uppercase tracking-widest">Global Setup</h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="section-label mb-1 block">Class Duration</label>
-                <select value={duration} onChange={e => setDuration(Number(e.target.value))} className="input-field text-sm">
-                  {[45,60,90].map(d => <option key={d} value={d} style={{ background: '#1A1D2E' }}>{d} min</option>)}
-                </select>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Start</label>
+                  <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/20 outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">End</label>
+                  <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/20 outline-none" />
+                </div>
               </div>
-              <div>
-                <label className="section-label mb-1 block">Half Day End</label>
-                <input type="time" value={halfDayEnd} onChange={e => setHalfDayEnd(e.target.value)} className="input-field text-sm" />
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Period Duration</label>
+                <div className="flex gap-2">
+                  {[45, 60, 90].map(d => (
+                    <button key={d} onClick={() => setDuration(d)}
+                      className={`flex-1 py-2 rounded-xl text-xs font-black transition-all border ${duration === d ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-white'}`}>
+                      {d}m
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Day Configuration */}
-          <div className="card p-5 space-y-3">
-            <h3 className="font-heading text-sm font-semibold text-white mb-1">Active Days</h3>
-            <p className="text-white/30 text-xs">Toggle days on/off and mark half-days with ☀️</p>
+          {/* Days Group */}
+          <div className="card p-6 border-slate-200/60 shadow-sm">
+            <div className="flex items-center gap-2 mb-6 text-slate-800">
+              <CalendarDays className="w-5 h-5 text-emerald-600" />
+              <h3 className="font-heading font-black text-sm uppercase tracking-widest">Active Days</h3>
+            </div>
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               {ALL_DAYS.map(day => {
                 const isActive = activeDays.includes(day)
                 const isHalf = halfDays.includes(day)
                 return (
-                  <div key={day} className={`flex items-center gap-3 p-2.5 rounded-xl border transition-all ${
-                    isActive ? 'border-white/12 bg-white/[0.03]' : 'border-white/5 opacity-40'
-                  }`}>
-                    {/* Day toggle */}
-                    <button
-                      onClick={() => toggleDay(day)}
-                      className={`w-8 h-8 rounded-lg text-xs font-bold flex-shrink-0 transition-all ${
-                        isActive
-                          ? 'bg-electric-blue/20 text-electric-blue border border-electric-blue/30'
-                          : 'bg-white/5 text-white/30 border border-white/8'
-                      }`}
-                    >
-                      {SHORT_DAYS[day]}
-                    </button>
-
-                    <span className={`flex-1 text-sm font-medium ${isActive ? 'text-white' : 'text-white/30'}`}>
-                      {day}
-                    </span>
-
-                    {/* Half-day toggle */}
+                  <button key={day} onClick={() => toggleDay(day)}
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl border text-left transition-all ${isActive ? 'bg-white border-slate-200 shadow-sm' : 'bg-slate-50 border-slate-100 opacity-50'}`}>
+                    <span className={`text-xs font-black uppercase tracking-tighter ${isActive ? 'text-slate-800' : 'text-slate-400'}`}>{SHORT_DAYS[day]}</span>
                     {isActive && (
-                      <button
-                        onClick={() => toggleHalfDay(day)}
-                        title={isHalf ? 'Mark full day' : 'Mark half day'}
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                          isHalf
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            : 'bg-white/5 text-white/25 border border-white/8 hover:text-amber-400 hover:border-amber-400/30'
-                        }`}
-                      >
-                        <Sun className="w-3 h-3" />
-                        {isHalf ? 'Half' : 'Full'}
-                      </button>
+                      <div onClick={(e) => { e.stopPropagation(); toggleHalfDay(day); }}
+                        className={`p-1 rounded-lg transition-colors ${isHalf ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-400 hover:text-amber-500'}`}>
+                        <Sun className="w-3.5 h-3.5" />
+                      </div>
                     )}
-                  </div>
+                  </button>
                 )
               })}
             </div>
-
-            {halfDays.length > 0 && (
-              <p className="text-xs text-amber-400/70 flex items-center gap-1.5 mt-1">
-                <Sun className="w-3 h-3" />
-                Half days end at <strong>{halfDayEnd}</strong>: {halfDays.join(', ')}
-              </p>
-            )}
           </div>
 
-          {/* Faculty */}
-          <div className="card p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-heading text-sm font-semibold text-white">Faculty</h3>
-              <button onClick={addFaculty} className="btn-ghost text-xs flex items-center gap-1 py-1.5 px-3">
-                <Plus className="w-3 h-3" /> Add
+          {/* Faculty Group */}
+          <div className="card p-6 border-slate-200/60 shadow-sm">
+            <div className="flex items-center justify-between mb-6 text-slate-800">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-purple-600" />
+                <h3 className="font-heading font-black text-sm uppercase tracking-widest">Faculty</h3>
+              </div>
+              <button onClick={addFaculty} className="p-1.5 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors">
+                <Plus className="w-4 h-4" />
               </button>
             </div>
-            <div className="space-y-3">
-              {faculties.map((f, i) => (
-                <motion.div key={f.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="p-3 rounded-xl border border-white/8 space-y-2 bg-white/[0.02]">
+
+            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+              {faculties.map((f) => (
+                <div key={f.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 group relative">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: f.color }} />
-                    <input
-                      value={f.name}
-                      onChange={e => updateFaculty(f.id, { name: e.target.value })}
-                      className="flex-1 bg-transparent text-white text-sm font-medium focus:outline-none"
-                    />
-                    <button onClick={() => removeFaculty(f.id)} className="text-white/20 hover:text-red-400 transition-colors">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: f.color }} />
+                    <input value={f.name} onChange={e => updateFaculty(f.id, { name: e.target.value })} className="flex-1 bg-transparent text-xs font-black text-slate-800 focus:outline-none" />
+                    <button onClick={() => removeFaculty(f.id)} className="opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-600">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <input
-                    value={f.subjects.join(', ')}
-                    onChange={e => updateFaculty(f.id, { subjects: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
-                    placeholder="Subjects (comma-separated)"
-                    className="input-field text-xs py-1.5"
-                  />
-                  <div className="flex items-center gap-2">
-                    <span className="text-white/30 text-xs">Max hrs/week:</span>
-                    <input type="number" value={f.maxHoursPerWeek}
-                      onChange={e => updateFaculty(f.id, { maxHoursPerWeek: Number(e.target.value) })}
-                      className="w-16 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:border-electric-blue/40"
-                    />
-                  </div>
-                </motion.div>
+                  <input value={f.subjects.join(', ')} onChange={e => updateFaculty(f.id, { subjects: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} placeholder="Subjects..." className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-bold text-slate-600" />
+                </div>
               ))}
             </div>
 
-            <button
-              onClick={handleGenerate}
-              disabled={generating || faculties.length === 0}
-              className="btn-primary w-full mt-4 flex items-center justify-center gap-2 text-sm disabled:opacity-50"
-            >
-              {generating
-                ? <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                : <Zap className="w-4 h-4" />}
-              {generating ? 'Generating…' : 'Generate Timetable'}
+            <button onClick={handleGenerate} disabled={generating || faculties.length === 0}
+              className="w-full mt-6 bg-slate-900 text-white rounded-2xl py-4 flex items-center justify-center gap-3 font-black uppercase tracking-[0.15em] text-xs hover:bg-black transition-all shadow-xl shadow-slate-200 disabled:opacity-50">
+              {generating ? <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full" /> : <Zap className="w-4 h-4 fill-amber-400 text-amber-400" />}
+              {generating ? 'Optimizing...' : 'Generate Plan'}
             </button>
           </div>
         </div>
 
-        {/* ── RIGHT PANEL ────────────────────────────────────────────────── */}
-        <div className="xl:col-span-3 space-y-4">
-
-          {/* Conflicts */}
+        {/* ── Timetable Output ────────────────────────────────────────── */}
+        <div className="flex-1 min-w-0">
+          
           <AnimatePresence>
             {conflicts.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                className="card p-4 border-red-500/20 bg-red-500/5">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertCircle className="w-4 h-4 text-red-400" />
-                  <span className="text-red-400 text-sm font-medium">{conflicts.length} Conflict(s)</span>
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+                className="mb-6 bg-red-50 border border-red-100 rounded-3xl p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-3">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                  <span className="text-red-700 text-sm font-black uppercase tracking-tight">{conflicts.length} System Conflicts Detected</span>
                 </div>
-                {conflicts.map((c, i) => <p key={i} className="text-xs text-red-300/70 ml-6">• {c}</p>)}
+                <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 pl-8">
+                  {conflicts.map((c, i) => <p key={i} className="text-[11px] text-red-500/80 font-bold">• {c}</p>)}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           {timetable ? (
-            <div className="card p-5">
-              {/* View Controls */}
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-2">
-                  {/* Week / Day toggle */}
-                  <div className="flex bg-white/[0.04] border border-white/8 rounded-xl p-1">
-                    <button
-                      onClick={() => setViewMode('week')}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${viewMode === 'week' ? 'bg-electric-blue text-white' : 'text-white/40 hover:text-white'}`}
-                    >
-                      <CalendarDays className="w-3.5 h-3.5" /> Week
-                    </button>
-                    <button
-                      onClick={() => setViewMode('day')}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${viewMode === 'day' ? 'bg-electric-blue text-white' : 'text-white/40 hover:text-white'}`}
-                    >
-                      <Calendar className="w-3.5 h-3.5" /> Day
-                    </button>
-                  </div>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card border-slate-200/60 shadow-xl overflow-hidden">
+              
+              {/* Toolbar */}
+              <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center bg-white border border-slate-200 p-1.5 rounded-2xl shadow-sm">
+                  <button onClick={() => setViewMode('week')}
+                    className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${viewMode === 'week' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
+                    Horizontal
+                  </button>
+                  <button onClick={() => setViewMode('day')}
+                    className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${viewMode === 'day' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
+                    Day View
+                  </button>
+                </div>
 
-                  {/* Day selector (day view) */}
+                <div className="flex items-center gap-3">
                   {viewMode === 'day' && (
-                    <select
-                      value={selectedDay}
-                      onChange={e => setSelectedDay(e.target.value)}
-                      className="input-field text-xs py-1.5 w-auto"
-                      style={{ background: '#1A1D2E' }}
-                    >
-                      {activeDays.map(d => (
-                        <option key={d} value={d} style={{ background: '#1A1D2E' }}>
-                          {d}{halfDays.includes(d) ? ' ☀️' : ''}
-                        </option>
-                      ))}
+                    <select value={selectedDay} onChange={e => setSelectedDay(e.target.value)}
+                      className="bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-black text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20">
+                      {activeDays.map(d => <option key={d} value={d}>{d}{halfDays.includes(d) ? ' (Half)' : ''}</option>)}
                     </select>
                   )}
-
-                  {conflicts.length === 0 && <span className="badge-safe">✓ No conflicts</span>}
+                  <button onClick={handleExport} className="flex items-center gap-2 bg-white border border-slate-200 px-5 py-2.5 rounded-2xl text-xs font-black text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+                    <Download className="w-4 h-4" /> Export
+                  </button>
                 </div>
-
-                <button onClick={handleExport} className="btn-ghost text-xs flex items-center gap-1 py-1.5 px-3">
-                  <Download className="w-3 h-3" /> Export
-                </button>
               </div>
 
-              {/* Grid */}
+              {/* Responsive Grid */}
               <div className="overflow-x-auto">
-                <div
-                  className="grid gap-3 min-w-[300px]"
-                  style={{ gridTemplateColumns: `repeat(${displayDays.length}, minmax(0,1fr))` }}
-                >
-                  {displayDays.map((day, di) => {
-                    const slots = timetable[day] || []
-                    const isHalf = halfDays.includes(day)
-                    return (
-                      <div key={day}>
-                        <div className="text-center text-[10px] font-bold text-white/40 uppercase mb-2 tracking-wider flex items-center justify-center gap-1">
-                          {viewMode === 'week' ? SHORT_DAYS[day] : day}
-                          {isHalf && <Sun className="w-2.5 h-2.5 text-amber-400" />}
-                        </div>
-                        <div className="space-y-1.5">
-                          {slots.map((slot, si) => (
-                            <motion.div
-                              key={si}
-                              initial={{ opacity: 0, y: 8 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: di * 0.04 + si * 0.03 }}
-                              className="rounded-xl p-2.5 text-center"
-                              style={{ background: `${slot.color}18`, border: `1px solid ${slot.color}30` }}
-                              title={`${slot.faculty} · ${slot.room}`}
-                            >
-                              <div className="font-semibold text-white text-[11px] truncate">{slot.subject}</div>
-                              <div className="text-[10px] mt-0.5" style={{ color: slot.color }}>{slot.startTime}–{slot.endTime}</div>
-                              <div className="text-white/25 text-[9px] truncate">{slot.room}</div>
-                            </motion.div>
-                          ))}
-                          {slots.length === 0 && (
-                            <div className="rounded-xl h-16 flex items-center justify-center text-[10px] text-white/15"
-                              style={{ background: 'rgba(255,255,255,0.01)', border: '1px dashed rgba(255,255,255,0.06)' }}>
-                              Free
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
+                {viewMode === 'week' ? (
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="p-6 text-left bg-slate-50/30 border-b border-slate-100 w-32">
+                          <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Day \ Time</span>
+                        </th>
+                        {timeSlots.map(slot => (
+                          <th key={slot.start} className="p-4 border-b border-slate-100 text-center bg-slate-50/30 min-w-[160px]">
+                            <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full">{slot.start} - {slot.end}</span>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeDays.map((day) => {
+                        const isHalf = halfDays.includes(day)
+                        return (
+                          <tr key={day} className="group border-b border-slate-50 last:border-0">
+                            <td className="p-6 bg-slate-50/10 group-hover:bg-slate-50 transition-colors">
+                              <div className="flex items-center gap-2">
+                                <span className="font-black text-slate-900 text-sm">{day}</span>
+                                {isHalf && <Sun className="w-4 h-4 text-amber-500" />}
+                              </div>
+                            </td>
+                            {timeSlots.map(slot => {
+                              const classSlot = timetable[day]?.find(s => s.startTime === slot.start)
+                              const isAfterHalfDay = isHalf && timeToMinutes(slot.start) >= timeToMinutes(halfDayEnd)
+                              
+                              if (isAfterHalfDay) {
+                                return (
+                                  <td key={slot.start} className="p-2 bg-slate-50/30">
+                                    <div className="h-20 flex items-center justify-center border border-slate-100/50 rounded-3xl opacity-20 bg-slate-100/30 grayscale">
+                                      <span className="text-[9px] font-black uppercase tracking-tighter">Off</span>
+                                    </div>
+                                  </td>
+                                )
+                              }
 
-              {/* Legend */}
-              <div className="mt-5 pt-4 border-t border-white/5 flex flex-wrap gap-3">
-                {faculties.map(f => (
-                  <div key={f.id} className="flex items-center gap-1.5 text-xs text-white/40">
-                    <div className="w-2.5 h-2.5 rounded-sm" style={{ background: f.color }} />
-                    {f.name.split(' ').pop()}
-                  </div>
-                ))}
-                {halfDays.length > 0 && (
-                  <div className="flex items-center gap-1.5 text-xs text-amber-400/60">
-                    <Sun className="w-2.5 h-2.5" /> Half day: ends {halfDayEnd}
+                              return (
+                                <td key={slot.start} className="p-2">
+                                  {classSlot ? (
+                                    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+                                      className="h-24 p-4 rounded-[2rem] border transition-all hover:scale-[1.02] hover:shadow-lg relative overflow-hidden group/item cursor-pointer"
+                                      style={{ background: `${classSlot.color}08`, borderColor: `${classSlot.color}20` }}>
+                                      <div className="relative z-10 flex flex-col h-full justify-between">
+                                        <div className="font-black text-slate-900 text-sm leading-tight">{classSlot.subject}</div>
+                                        <div className="flex items-center justify-between mt-auto">
+                                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{classSlot.faculty.split(' ').pop()}</span>
+                                          <div className="flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-lg border border-slate-100">
+                                            <MapPin className="w-2.5 h-2.5 text-slate-400" />
+                                            <span className="text-[9px] font-black text-slate-600">{classSlot.room}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="absolute top-0 right-0 w-16 h-16 opacity-10 -mr-4 -mt-4 transition-transform group-hover/item:scale-110" style={{ background: classSlot.color, borderRadius: '100%' }} />
+                                    </motion.div>
+                                  ) : (
+                                    <div className="h-24 border-2 border-dashed border-slate-100 rounded-[2rem] flex items-center justify-center group-hover:border-slate-200 transition-all">
+                                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-400">Free</span>
+                                    </div>
+                                  )}
+                                </td>
+                              )
+                            })}
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="p-8 grid md:grid-cols-2 gap-8 bg-slate-50/20">
+                    {activeDays.map(day => {
+                      const slots = timetable[day] || []
+                      if (viewMode === 'day' && day !== selectedDay) return null
+                      return (
+                        <div key={day} className="space-y-4">
+                          <div className="flex items-center gap-3">
+                            <h4 className="font-black text-slate-900 uppercase tracking-widest">{day}</h4>
+                            <div className="h-px flex-1 bg-slate-200" />
+                          </div>
+                          <div className="space-y-3">
+                            {slots.map((s, si) => (
+                              <motion.div key={si} initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: si * 0.05 }}
+                                className="bg-white p-5 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-5 hover:border-slate-200 transition-all">
+                                <div className="w-16 h-16 rounded-[1.5rem] flex flex-col items-center justify-center flex-shrink-0" style={{ background: `${s.color}10`, color: s.color }}>
+                                  <span className="text-[10px] font-black leading-none">{s.startTime.split(':')[0]}</span>
+                                  <div className="w-6 h-0.5 bg-current my-1 opacity-20" />
+                                  <span className="text-[10px] font-black leading-none">{s.startTime.split(':')[1]}</span>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="font-black text-slate-900 text-lg leading-tight mb-1">{s.subject}</div>
+                                  <div className="flex items-center gap-4 text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                                    <span className="flex items-center gap-1.5"><Users className="w-3 h-3" /> {s.faculty}</span>
+                                    <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Room {s.room}</span>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           ) : (
-            <div className="card p-16 flex flex-col items-center justify-center text-center min-h-64"
-              style={{ border: '1px dashed rgba(255,255,255,0.06)' }}>
-              <Zap className="w-10 h-10 text-white/10 mb-4" />
-              <p className="text-white/30 text-sm">Configure days, faculty, and timings — then generate</p>
-              <p className="text-white/15 text-xs mt-1">Supports week view, day view, and half-day scheduling</p>
+            <div className="card p-20 flex flex-col items-center justify-center text-center border-2 border-dashed border-slate-200 bg-slate-50/30">
+              <div className="w-20 h-20 rounded-full bg-white shadow-lg border border-slate-100 flex items-center justify-center mb-8">
+                <Zap className="w-10 h-10 text-amber-400 fill-amber-400" />
+              </div>
+              <h4 className="font-heading text-2xl font-black text-slate-900 mb-3 uppercase tracking-tighter">Engine Ready</h4>
+              <p className="text-slate-400 text-sm font-bold max-w-xs leading-relaxed uppercase tracking-widest text-[10px]">Configure your parameters on the left to generate an optimized academic schedule.</p>
+              <div className="mt-10 grid grid-cols-3 gap-8">
+                <div className="text-center">
+                  <div className="text-xl font-black text-slate-900 mb-1">∞</div>
+                  <div className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Combinations</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-black text-slate-900 mb-1">0</div>
+                  <div className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Conflicts</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-black text-slate-900 mb-1">100%</div>
+                  <div className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Accuracy</div>
+                </div>
+              </div>
             </div>
           )}
         </div>
       </div>
     </PageWrapper>
   )
+}
+
+function timeToMinutes(time: string): number {
+  const [h, m] = time.split(':').map(Number)
+  return h * 60 + m
 }

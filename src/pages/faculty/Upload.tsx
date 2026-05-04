@@ -68,12 +68,12 @@ export default function UploadPage({ onLogout }: UploadPageProps) {
                 onClick={() => { setSelectedSubject(s.id); setDone(null) }}
                 className={`p-4 rounded-xl border text-left transition-all ${
                   selectedSubject === s.id
-                    ? 'border-electric-blue/40 bg-electric-blue/10'
-                    : 'border-white/8 hover:border-white/20 bg-white/3'
+                    ? 'border-blue-200 bg-blue-50 shadow-sm'
+                    : 'border-navy-100 hover:border-navy-200 bg-navy-50/30'
                 }`}
               >
-                <div className="font-semibold text-white text-sm">{s.code}</div>
-                <div className="text-white/40 text-xs truncate">{s.name}</div>
+                <div className={`font-bold text-sm ${selectedSubject === s.id ? 'text-blue-700' : 'text-navy-800'}`}>{s.code}</div>
+                <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${selectedSubject === s.id ? 'text-blue-500' : 'text-navy-400'}`}>{s.name}</div>
               </button>
             ))}
           </div>
@@ -91,10 +91,10 @@ export default function UploadPage({ onLogout }: UploadPageProps) {
             className={`
               border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-200
               ${isDragOver
-                ? 'border-electric-blue/60 bg-electric-blue/5'
+                ? 'border-blue-400 bg-blue-50 shadow-inner'
                 : file
-                  ? 'border-emerald-500/40 bg-emerald-500/5'
-                  : 'border-white/10 hover:border-white/20 hover:bg-white/3'
+                  ? 'border-emerald-300 bg-emerald-50 shadow-inner'
+                  : 'border-navy-100 hover:border-navy-200 bg-navy-50/50 hover:bg-white hover:shadow-card'
               }
             `}
           >
@@ -114,18 +114,18 @@ export default function UploadPage({ onLogout }: UploadPageProps) {
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center gap-3"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center">
-                    <File className="w-7 h-7 text-emerald-400" />
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center shadow-sm">
+                    <File className="w-8 h-8 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{file.name}</p>
-                    <p className="text-white/30 text-sm">{(file.size / 1024).toFixed(0)} KB</p>
+                    <p className="text-navy-800 font-bold text-lg">{file.name}</p>
+                    <p className="text-navy-400 font-bold text-xs">{(file.size / 1024).toFixed(0)} KB · Ready to train</p>
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); setFile(null) }}
-                    className="text-red-400/60 hover:text-red-400 text-xs flex items-center gap-1"
+                    className="text-red-500 hover:text-red-600 text-xs font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50"
                   >
-                    <X className="w-3 h-3" /> Remove
+                    <X className="w-3.5 h-3.5" /> Remove
                   </button>
                 </motion.div>
               ) : (
@@ -135,12 +135,12 @@ export default function UploadPage({ onLogout }: UploadPageProps) {
                   animate={{ opacity: 1 }}
                   className="flex flex-col items-center gap-3"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center">
-                    <Upload className="w-7 h-7 text-white/30" />
+                  <div className="w-16 h-16 rounded-2xl bg-navy-50 flex items-center justify-center border border-navy-100 shadow-sm">
+                    <Upload className="w-8 h-8 text-navy-300" />
                   </div>
                   <div>
-                    <p className="text-white/70 font-medium">Drop your PDF here</p>
-                    <p className="text-white/30 text-sm">or click to browse</p>
+                    <p className="text-navy-800 font-bold text-lg">Drop your PDF here</p>
+                    <p className="text-navy-400 font-bold text-xs uppercase tracking-widest">or click to browse</p>
                   </div>
                 </motion.div>
               )}
@@ -177,16 +177,15 @@ export default function UploadPage({ onLogout }: UploadPageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="card p-6 flex items-center gap-4"
-              style={{ border: '1px solid rgba(16,185,129,0.3)', background: 'rgba(16,185,129,0.05)' }}
+              className="card p-6 flex items-center gap-4 border-emerald-200 bg-emerald-50"
             >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                <Check className="w-6 h-6 text-emerald-400" />
+              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Check className="w-6 h-6 text-emerald-600" />
               </div>
               <div>
-                <h3 className="font-heading text-emerald-400 font-semibold">AI Agent Updated!</h3>
-                <p className="text-white/60 text-sm mt-0.5">
-                  AI Agent is now trained on your <strong className="text-white">{done}</strong> material.
+                <h3 className="font-heading text-emerald-700 font-bold">AI Agent Updated!</h3>
+                <p className="text-emerald-800/60 text-sm font-medium mt-0.5">
+                  AI Agent is now trained on your <strong className="text-navy-800">{done}</strong> material.
                   Students can now ask questions grounded in this content.
                 </p>
               </div>

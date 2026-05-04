@@ -71,8 +71,8 @@ export default function LeavePage({ onLogout }: LeavePageProps) {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden mb-6"
           >
-            <div className="card p-6" style={{ border: '1px solid rgba(79,142,247,0.2)' }}>
-              <h2 className="font-heading text-lg font-semibold text-white mb-5">New Leave Application</h2>
+            <div className="card p-6 border-blue-200 bg-blue-50/30">
+              <h2 className="font-heading text-lg font-bold text-navy-800 mb-5">New Leave Application</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
@@ -100,11 +100,11 @@ export default function LeavePage({ onLogout }: LeavePageProps) {
                     <select
                       value={form.type}
                       onChange={e => setForm({ ...form, type: e.target.value as any })}
-                      className="input-field"
+                      className="input-field font-bold"
                     >
-                      <option value="Medical" style={{ background: '#1A1D2E' }}>Medical</option>
-                      <option value="Personal" style={{ background: '#1A1D2E' }}>Personal</option>
-                      <option value="Official" style={{ background: '#1A1D2E' }}>Official</option>
+                      <option value="Medical">Medical</option>
+                      <option value="Personal">Personal</option>
+                      <option value="Official">Official</option>
                     </select>
                   </div>
                 </div>
@@ -140,27 +140,28 @@ export default function LeavePage({ onLogout }: LeavePageProps) {
 
       {/* Leave History */}
       <div className="card p-6">
-        <h2 className="font-heading text-lg font-semibold text-white mb-5">Leave History</h2>
+        <h2 className="font-heading text-lg font-bold text-navy-800 mb-5">Leave History</h2>
         <div className="space-y-3">
           {myLeaves.length === 0 ? (
-            <p className="text-white/30 text-sm text-center py-8">No leave requests yet</p>
+            <p className="text-navy-300 font-bold text-sm text-center py-12 bg-navy-50/50 rounded-2xl border-2 border-dashed border-navy-100">
+              No leave requests yet
+            </p>
           ) : (
             myLeaves.map((leave, i) => (
-              <motion.div
-                key={leave.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.08 }}
-                className="flex items-center gap-4 p-4 rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
-              >
-                <FileText className="w-5 h-5 text-white/30 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium">{leave.reason}</p>
-                  <p className="text-white/40 text-xs mt-0.5">
-                    {leave.fromDate} → {leave.toDate} · <span className="text-white/60">{leave.type}</span>
-                  </p>
-                </div>
+                <motion.div
+                  key={leave.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                  className="flex items-center gap-4 p-4 rounded-xl border border-navy-50 bg-navy-50/30 hover:bg-white hover:shadow-card transition-all"
+                >
+                  <FileText className="w-5 h-5 text-navy-300 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-navy-800 text-sm font-bold">{leave.reason}</p>
+                    <p className="text-navy-400 text-[10px] font-bold uppercase tracking-wider mt-1">
+                      {leave.fromDate} → {leave.toDate} · <span className="text-blue-600">{leave.type}</span>
+                    </p>
+                  </div>
                 <span className={`badge-${leave.status.toLowerCase()}`}>
                   {leave.status === 'Pending' ? '🟡' : leave.status === 'Approved' ? '🟢' : '🔴'} {leave.status}
                 </span>

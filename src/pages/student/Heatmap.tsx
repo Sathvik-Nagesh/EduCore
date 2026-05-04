@@ -32,11 +32,11 @@ export default function HeatmapPage({ onLogout }: HeatmapPageProps) {
         className="card p-6 mb-6"
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-heading text-lg font-semibold text-white">
+          <h2 className="font-heading text-lg font-bold text-navy-800">
             Daily Attendance — Last 30 Days
           </h2>
-          <div className="flex items-center gap-4 text-xs text-white/40">
-            <span>GitHub-style contribution heatmap</span>
+          <div className="flex items-center gap-4 text-xs text-navy-400 font-medium">
+            <span>Engagement patterns</span>
           </div>
         </div>
         {loading ? (
@@ -53,7 +53,7 @@ export default function HeatmapPage({ onLogout }: HeatmapPageProps) {
         transition={{ delay: 0.2 }}
         className="card p-6"
       >
-        <h2 className="font-heading text-lg font-semibold text-white mb-6">
+        <h2 className="font-heading text-lg font-bold text-navy-800 mb-6">
           Subject Attendance Breakdown
         </h2>
         {loading ? (
@@ -74,11 +74,11 @@ export default function HeatmapPage({ onLogout }: HeatmapPageProps) {
               >
                 {/* Label */}
                 <div className="w-12 text-right">
-                  <span className="text-xs font-semibold text-white/60">{subject.code}</span>
+                  <span className="text-xs font-bold text-navy-400 uppercase tracking-wider">{subject.code}</span>
                 </div>
 
                 {/* Bar */}
-                <div className="flex-1 h-10 rounded-xl overflow-hidden bg-white/5 relative">
+                <div className="flex-1 h-10 rounded-xl overflow-hidden bg-navy-50 relative">
                   <motion.div
                     className="h-full rounded-xl flex items-center pl-3"
                     style={{ background: statusColor[subject.status] }}
@@ -107,18 +107,18 @@ export default function HeatmapPage({ onLogout }: HeatmapPageProps) {
         )}
 
         {/* Legend */}
-        <div className="mt-6 flex gap-6 text-xs text-white/40">
+        <div className="mt-6 flex gap-6 text-xs text-navy-400 font-bold uppercase tracking-widest">
           <span className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" />
-            Safe (≥75%)
+            Safe
           </span>
           <span className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />
-            Warning (65–74%)
+            Warning
           </span>
           <span className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-red-500 inline-block" />
-            Danger (&lt;65%)
+            Danger
           </span>
         </div>
       </motion.div>

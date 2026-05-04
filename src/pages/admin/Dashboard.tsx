@@ -27,9 +27,9 @@ const TreemapContent = (props: any) => {
       {width > 50 && height > 30 && (
         <>
           <text x={x + width / 2} y={y + height / 2 - 6} textAnchor="middle"
-            style={{ fill: '#fff', fontSize: 11, fontWeight: 700 }}>{name}</text>
+            style={{ fill: '#1E293B', fontSize: 11, fontWeight: 700 }}>{name}</text>
           <text x={x + width / 2} y={y + height / 2 + 10} textAnchor="middle"
-            style={{ fill: col, fontSize: 10 }}>{pct}%</text>
+            style={{ fill: col, fontSize: 10, fontWeight: 600 }}>{pct}%</text>
         </>
       )}
     </g>
@@ -72,10 +72,17 @@ const ScatterTip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null
   const d = payload[0]?.payload
   return (
-    <div style={{ background:'rgba(26,29,46,0.92)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'8px 12px' }}>
-      <p style={{ color:'#fff', fontWeight:700, fontSize:12 }}>{d?.name}</p>
-      <p style={{ color:'#4F8EF7', fontSize:11 }}>AI Queries: {d?.ai}</p>
-      <p style={{ color:'#10B981', fontSize:11 }}>Attendance: {d?.attendance}%</p>
+    <div style={{ 
+      background:'rgba(255,255,255,0.95)', 
+      backdropFilter: 'blur(10px)',
+      border:'1px solid rgba(0,0,0,0.08)', 
+      borderRadius:14, 
+      padding:'10px 14px',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+    }}>
+      <p style={{ color:'#0F172A', fontWeight:800, fontSize:13 }}>{d?.name}</p>
+      <p style={{ color:'#3B82F6', fontSize:11, fontWeight: 600 }}>AI Queries: {d?.ai}</p>
+      <p style={{ color:'#10B981', fontSize:11, fontWeight: 600 }}>Attendance: {d?.attendance}%</p>
     </div>
   )
 }
@@ -106,13 +113,15 @@ export default function AdminDashboard({ onLogout }: Props) {
           const Icon = k.icon
           return (
             <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.07 }} className="card p-5">
+              transition={{ delay: i * 0.07 }} className="card p-5 hover:shadow-card-hover group">
               <div className="flex items-center gap-2 mb-2">
-                <Icon className="w-4 h-4" style={{ color: k.color }} />
-                <span className="text-xs text-white/40">{k.label}</span>
+                <div className="p-2 rounded-lg" style={{ background: `${k.color}10` }}>
+                  <Icon className="w-4 h-4" style={{ color: k.color }} />
+                </div>
+                <span className="text-xs font-black uppercase tracking-widest text-slate-400">{k.label}</span>
               </div>
-              <div className="font-heading text-3xl font-black text-white">
-                <AnimatedCounter value={k.value} /><span className="text-base text-white/30">{k.unit}</span>
+              <div className="font-heading text-3xl font-black text-slate-900">
+                <AnimatedCounter value={k.value} /><span className="text-base text-slate-200 ml-1">{k.unit}</span>
               </div>
             </motion.div>
           )
@@ -123,9 +132,9 @@ export default function AdminDashboard({ onLogout }: Props) {
 
         {/* ── At-Risk Treemap ───────────────────────────────────── */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }} className="card p-5 lg:col-span-2">
-          <h3 className="font-heading text-sm font-semibold text-white mb-1">At-Risk Students</h3>
-          <p className="text-xs text-white/30 mb-3">Larger block = further below 75% · hover for name</p>
+          transition={{ delay: 0.1 }} className="card p-6 lg:col-span-2">
+          <h3 className="font-heading text-lg font-bold text-slate-800 mb-1">At-Risk Students</h3>
+          <p className="text-xs text-slate-400 font-black mb-4 uppercase tracking-widest">Attendance below 75% threshold</p>
           <ResponsiveContainer width="100%" height={230}>
             <Treemap
               data={AT_RISK.map(s => ({ ...s, size: 75 - s.pct }))}
@@ -136,10 +145,10 @@ export default function AdminDashboard({ onLogout }: Props) {
                 if (!active || !payload?.length) return null
                 const d = payload[0]?.payload
                 return (
-                  <div style={{ background:'rgba(26,29,46,0.92)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, padding:'8px 12px' }}>
-                    <p style={{ color:'#fff', fontWeight:700, fontSize:12 }}>{d?.name}</p>
-                    <p style={{ color:'#EF4444', fontSize:11 }}>{d?.pct}% attendance</p>
-                    <p style={{ color:'rgba(255,255,255,0.4)', fontSize:10 }}>{75 - d?.pct}% below threshold</p>
+                  <div style={{ background:'rgba(255,255,255,0.95)', backdropFilter:'blur(8px)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:12, padding:'10px 14px', boxShadow:'0 10px 25px rgba(239,68,68,0.1)' }}>
+                    <p style={{ color:'#0F172A', fontWeight:800, fontSize:13 }}>{d?.name}</p>
+                    <p style={{ color:'#EF4444', fontSize:11, fontWeight:700 }}>{d?.pct}% attendance</p>
+                    <p style={{ color:'#94A3B8', fontSize:10, fontWeight:500 }}>{75 - d?.pct}% below threshold</p>
                   </div>
                 )
               }} />
@@ -149,9 +158,9 @@ export default function AdminDashboard({ onLogout }: Props) {
 
         {/* ── Campus Activity Line + Brush ─────────────────────── */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.15 }} className="card p-5 lg:col-span-3">
-          <h3 className="font-heading text-sm font-semibold text-white mb-1">Campus Activity (30 days)</h3>
-          <p className="text-xs text-white/30 mb-4">Drag the brush to zoom in on a date range</p>
+          transition={{ delay: 0.15 }} className="card p-6 lg:col-span-3">
+          <h3 className="font-heading text-lg font-bold text-slate-800 mb-1">Campus Activity</h3>
+          <p className="text-xs text-slate-400 font-black mb-4 uppercase tracking-widest">Active students vs AI queries (30 days)</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={ACTIVITY} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid {...GRID_STYLE} />
@@ -162,9 +171,9 @@ export default function AdminDashboard({ onLogout }: Props) {
                 stroke="#4F8EF7" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="ai" name="AI Queries"
                 stroke="#8B5CF6" strokeWidth={2} dot={false} strokeDasharray="4 2" />
-              <Brush dataKey="day" height={20} travellerWidth={6}
-                stroke="rgba(255,255,255,0.1)"
-                fill="rgba(26,29,46,0.8)" />
+              <Brush dataKey="day" height={24} travellerWidth={8}
+                stroke="#E2E8F0"
+                fill="#F8FAFC" />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -172,18 +181,18 @@ export default function AdminDashboard({ onLogout }: Props) {
 
       {/* ── AI Usage Scatter ───────────────────────────────────── */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }} className="card p-5">
-        <h3 className="font-heading text-sm font-semibold text-white mb-1">AI Usage vs Attendance Correlation</h3>
-        <p className="text-xs text-white/30 mb-4">Do students who use the AI more attend less? Hover a dot to find out.</p>
+        transition={{ delay: 0.2 }} className="card p-6">
+        <h3 className="font-heading text-lg font-bold text-slate-800 mb-1">AI Usage vs Attendance Correlation</h3>
+        <p className="text-xs text-slate-400 font-black mb-4 uppercase tracking-widest">Cross-metric behavioral analysis</p>
         <ResponsiveContainer width="100%" height={200}>
           <ScatterChart margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
             <CartesianGrid {...GRID_STYLE} />
             <XAxis type="number" dataKey="ai" name="AI Queries" {...AXIS_STYLE}
-              label={{ value: 'AI Queries', position: 'insideBottom', offset: -2, fill: 'rgba(255,255,255,0.2)', fontSize: 10 }} />
+              label={{ value: 'AI Queries', position: 'insideBottom', offset: -2, fill: '#94A3B8', fontSize: 10, fontWeight: 700 }} />
             <YAxis type="number" dataKey="attendance" name="Attendance" {...AXIS_STYLE}
               domain={[45, 100]} />
             <ZAxis range={[60, 160]} />
-            <Tooltip content={<ScatterTip />} cursor={{ stroke: 'rgba(255,255,255,0.1)' }} />
+            <Tooltip content={<ScatterTip />} cursor={{ stroke: 'rgba(0,0,0,0.05)' }} />
             <Scatter data={SCATTER_DATA}>
               {SCATTER_DATA.map((d, i) => (
                 <Cell key={i}
@@ -193,10 +202,10 @@ export default function AdminDashboard({ onLogout }: Props) {
             </Scatter>
           </ScatterChart>
         </ResponsiveContainer>
-        <div className="flex gap-4 mt-2 text-xs text-white/30">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Above 75%</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> 60–75%</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500 inline-block" /> Below 60%</span>
+        <div className="flex gap-6 mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm" /> Above 75%</span>
+          <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" /> 60–75%</span>
+          <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" /> Below 60%</span>
         </div>
       </motion.div>
     </PageWrapper>
