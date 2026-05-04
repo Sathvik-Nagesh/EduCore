@@ -21,7 +21,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function EngagementBar({ data, height = 200 }: EngagementBarProps) {
   return (
-    <div style={{ width: '100%', height: height, minHeight: height }}>
+    <div className="relative min-h-0" style={{ width: '100%', height: height, minHeight: height }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <XAxis

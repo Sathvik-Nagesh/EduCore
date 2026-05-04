@@ -194,17 +194,22 @@ export function useAIChat() {
       setLastProvider(provider)
 
       // Log to Supabase
-      const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
-      if (user.id) {
-        await insertAIInteraction({
-          student_id: user.id,
-          subject_id: subjectId,
-          query: content,
-          response_length: fullResponse.length,
-          provider: provider as 'nvidia' | 'gemini' | 'mock'
-        })
+      try {
+        const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
+        if (user.id) {
+          await insertAIInteraction({
+            student_id: user.id,
+            subject_id: subjectId,
+            query: content,
+            response_length: fullResponse.length,
+            provider: provider as 'nvidia' | 'gemini' | 'mock'
+          })
+        }
+      } catch (err) {
+        console.warn('[Supabase] Failed to log AI interaction:', err)
       }
-    } catch {
+    } catch (e) {
+      console.error(e)
       fullResponse = "I'm unable to respond right now. Please try again in a moment."
     }
 
