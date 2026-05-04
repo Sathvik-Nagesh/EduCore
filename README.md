@@ -21,10 +21,15 @@ EduCore is a next-generation academic administration and student engagement plat
 - **Data Portability**: Professional CSV reporting for administrative oversight.
 
 ## 🛠 Tech Stack
-- **Frontend**: React (Vite), Tailwind CSS, Framer Motion
-- **Visualization**: Recharts (Customized for professional academic reporting)
-- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
+- **Frontend Framework**: React 19 (Vite), TypeScript
+- **Styling & Animation**: Tailwind CSS, Framer Motion
+- **UI Components**: Radix UI Primitives, Lucide React (Icons)
+- **Data Visualization**: Recharts (Customized for professional academic reporting)
+- **Routing & State**: React Router v7, React Hot Toast
+- **Backend Services**: Supabase (PostgreSQL, Auth, Real-time)
 - **AI Engine**: Gemini 1.5 / NVIDIA NIM (Integrated for study assistance)
+- **PWA & Storage**: Vite PWA plugin, IndexedDB (`idb`)
+- **Document Processing**: PDF.js (for syllabus/document ingestion)
 
 ## 🎨 Design System
 EduCore uses a premium, high-contrast design language featuring:

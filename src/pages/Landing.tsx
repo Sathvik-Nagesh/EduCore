@@ -178,7 +178,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div>
-              <h2 className="font-heading text-5xl md:text-7xl font-black mb-10 leading-[1.1] text-slate-900">One Solution. <br/><span className="text-slate-200">Three Views.</span></h2>
+              <h2 className="font-heading text-5xl md:text-7xl font-black mb-10 leading-[1.1] text-slate-900">One Solution. <br/><span className="text-slate-400">Three Views.</span></h2>
               
               <div className="space-y-14">
                 {[
@@ -192,7 +192,7 @@ export default function Landing() {
                     </div>
                     <div>
                       <h4 className={`font-heading text-2xl font-black mb-3 ${role.color} tracking-tight`}>{role.title}</h4>
-                      <p className="text-slate-500 text-lg leading-relaxed font-medium">{role.text}</p>
+                      <p className="text-slate-600 text-lg leading-relaxed font-medium">{role.text}</p>
                     </div>
                   </div>
                 ))}
@@ -240,9 +240,9 @@ export default function Landing() {
               </div>
               <span className="font-heading font-black text-3xl text-slate-900 tracking-tighter">EduCore</span>
             </div>
-            <p className="text-slate-500 max-w-sm font-medium">The future of campus management is here. Join the movement.</p>
+            <p className="text-slate-600 max-w-sm font-medium">The future of campus management is here. Join the movement.</p>
           </div>
-          <div className="flex justify-center gap-10 text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+          <div className="flex justify-center gap-10 text-xs font-black uppercase tracking-[0.2em] text-slate-500">
             <a href="/privacy" className="hover:text-slate-900 transition-colors">Privacy</a>
             <a href="/terms" className="hover:text-slate-900 transition-colors">Terms</a>
             <a href="#" className="hover:text-slate-900 transition-colors">Docs</a>
