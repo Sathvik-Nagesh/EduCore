@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, File, Check, Bot, X } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
 import toast from 'react-hot-toast'
-import { SUBJECTS } from '../../lib/mockData'
+import { uploadStudyMaterial, getSubjects } from '../../lib/supabase'
+import { useEffect } from 'react'
 
 interface UploadPageProps {
   onLogout: () => void
@@ -11,7 +12,8 @@ interface UploadPageProps {
 
 export default function UploadPage({ onLogout }: UploadPageProps) {
   const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
-  const [selectedSubject, setSelectedSubject] = useState(SUBJECTS[0].id)
+  const [subjects, setSubjects] = useState<any[]>([])
+  const [selectedSubject, setSelectedSubject] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   const [done, setDone] = useState<string | null>(null)
@@ -35,26 +37,47 @@ export default function UploadPage({ onLogout }: UploadPageProps) {
 
   const [uploadStep, setUploadStep] = useState<string>('')
 
+  useEffect(() => {
+    getSubjects().then(data => {
+      setSubjects(data)
+      if (data.length > 0) setSelectedSubject(data[0].id)
+    })
+  }, [])
+
   const handleUpload = async () => {
-    if (!file) return
+    if (!file || !selectedSubject) return
     setUploading(true)
     setDone(null)
 
     const steps = ['Analyzing Document Structure', 'Extracting Text and Tables', 'Vectorizing for RAG', 'Syncing with Knowledge Base']
     for (const step of steps) {
       setUploadStep(step)
-      await new Promise(res => setTimeout(res, 800 + Math.random() * 700))
+      await new Promise(res => setTimeout(res, 600))
     }
 
-    const subjectName = SUBJECTS.find(s => s.id === selectedSubject)?.name || 'Subject'
-    setDone(subjectName)
-    setFile(null)
+    const { error } = await uploadStudyMaterial({
+      subject_id: selectedSubject,
+      title: file.name.replace('.pdf', ''),
+      description: `Course material for ${file.name}`,
+      file_type: 'pdf',
+      file_size: `${(file.size / 1024).toFixed(0)} KB`,
+      uploaded_by: user.id
+    })
+
+    if (error) {
+      toast.error('Failed to sync material with AI')
+    } else {
+      const subName = subjects.find(s => s.id === selectedSubject)?.name || 'Subject'
+      setDone(subName)
+      setFile(null)
+      toast.success(`AI Agent is now trained on ${subName}! 🤖`)
+    }
+
     setUploading(false)
     setUploadStep('')
-    toast.success(`AI Agent is now trained on your ${subjectName} material! 🤖`)
   }
 
-  const subject = SUBJECTS.find(s => s.id === selectedSubject)
+  const subject = subjects.find(s => s.id === selectedSubject)
 
   return (
     <PageWrapper
@@ -69,14 +92,14 @@ export default function UploadPage({ onLogout }: UploadPageProps) {
         <div className="card p-8 border-slate-100 shadow-xl">
           <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Target Course Discipline</label>
           <div className="grid grid-cols-2 gap-3">
-            {SUBJECTS.map(s => (
+            {subjects.map(s => (
               <button
                 key={s.id}
                 onClick={() => { setSelectedSubject(s.id); setDone(null) }}
                 className={`p-4 rounded-2xl border text-left transition-all relative overflow-hidden group ${
                   selectedSubject === s.id
                     ? 'border-slate-900 bg-slate-900 text-white shadow-lg'
-                    : 'border-slate-200 hover:border-slate-400 bg-slate-50/50'
+                    : 'border-slate-200 hover:border-slate-400 bg-white shadow-sm'
                 }`}
               >
                 {selectedSubject === s.id && <div className="absolute right-3 top-3"><Check className="w-4 h-4 text-white" /></div>}
@@ -102,7 +125,7 @@ export default function UploadPage({ onLogout }: UploadPageProps) {
                 ? 'border-slate-900 bg-slate-50 shadow-inner'
                 : file
                   ? 'border-emerald-500 bg-emerald-50/30 shadow-inner'
-                  : 'border-slate-200 hover:border-slate-900 bg-slate-50/30 hover:bg-white hover:shadow-2xl'
+                  : 'border-slate-200 hover:border-slate-900 bg-white hover:bg-slate-50/30 hover:shadow-2xl'
               }
             `}
           >

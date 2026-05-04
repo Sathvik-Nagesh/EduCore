@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { ShieldAlert, Download, ArrowUpDown } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
-import { AT_RISK_STUDENTS } from '../../lib/mockData'
+import { AT_RISK_STUDENTS as MOCK_STUDENTS } from '../../lib/mockData'
 import { getAttendanceStatus, getStatusColor } from '../../lib/predictions'
+import { getAllAttendance } from '../../lib/supabase'
+import { useEffect } from 'react'
 
 interface AtRiskPageProps {
   onLogout: () => void
@@ -11,10 +11,47 @@ interface AtRiskPageProps {
 
 export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
   const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
+  const [students, setStudents] = useState<any[]>(MOCK_STUDENTS)
   const [sortBy, setSortBy] = useState<'attendance' | 'name' | 'subject'>('attendance')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [isLoading, setIsLoading] = useState(true)
 
-  const sorted = [...AT_RISK_STUDENTS].sort((a, b) => {
+  useEffect(() => {
+    getAllAttendance().then(records => {
+      if (!records || records.length === 0) {
+        setIsLoading(false)
+        return
+      }
+
+      // Group by Student + Subject
+      const riskMap: Record<string, any> = {}
+      records.forEach(r => {
+        const key = `${r.student_id}_${r.subject_id}`
+        if (!riskMap[key]) {
+          riskMap[key] = {
+            id: key,
+            name: r.profiles?.name || 'Unknown',
+            rollNo: r.profiles?.roll_no || 'N/A',
+            subject: r.subjects?.name || 'Subject',
+            department: r.profiles?.department || 'Gen',
+            attended: 0,
+            total: 0
+          }
+        }
+        riskMap[key].total++
+        if (r.is_present) riskMap[key].attended++
+      })
+
+      const realRisk = Object.values(riskMap)
+        .map(s => ({ ...s, attendance: Math.round((s.attended / s.total) * 100) }))
+        .filter(s => s.attendance < 75)
+
+      if (realRisk.length > 0) setStudents(realRisk)
+      setIsLoading(false)
+    }).catch(() => setIsLoading(false))
+  }, [])
+
+  const sorted = [...students].sort((a, b) => {
     let va = a[sortBy] as string | number
     let vb = b[sortBy] as string | number
     if (typeof va === 'string') va = va.toLowerCase()
@@ -45,14 +82,14 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
       userName={user.name || 'Admin'}
       onLogout={onLogout}
       title="At-Risk Students"
-      subtitle={`${AT_RISK_STUDENTS.length} students below 75% attendance`}
+      subtitle={`${students.length} students below 75% attendance`}
     >
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[
-          { label: 'Below 65%', count: AT_RISK_STUDENTS.filter(s => s.attendance < 65).length, color: '#EF4444' },
-          { label: '65–74%', count: AT_RISK_STUDENTS.filter(s => s.attendance >= 65 && s.attendance < 75).length, color: '#F59E0B' },
-          { label: 'Total At-Risk', count: AT_RISK_STUDENTS.length, color: '#2563EB' },
+          { label: 'Below 65%', count: students.filter(s => s.attendance < 65).length, color: '#EF4444' },
+          { label: '65–74%', count: students.filter(s => s.attendance >= 65 && s.attendance < 75).length, color: '#F59E0B' },
+          { label: 'Total At-Risk', count: students.length, color: '#2563EB' },
         ].map(stat => (
           <motion.div
             key={stat.label}

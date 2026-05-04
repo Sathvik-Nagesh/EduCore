@@ -48,8 +48,7 @@ export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
     <div className="overflow-x-auto pb-1 scrollbar-hide">
       <div className="inline-block p-2">
         {/* Month Labels */}
-        <div className="flex gap-[12px] mb-4">
-          <div className="w-12" />
+        <div className="flex gap-[16px] mb-6 pl-14">
           {weeks.map((week, i) => {
             const date = week.find(d => d.date !== '')?.date
             const currentMonth = date ? format(parseISO(date), 'MMM') : ''
@@ -59,17 +58,17 @@ export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
             const shouldShow = i === 0 || (currentMonth !== prevMonth && currentMonth !== '')
             
             return (
-              <div key={i} className="w-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
+              <div key={i} className="w-10 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
                 {shouldShow ? currentMonth : ''}
               </div>
             )
           })}
         </div>
 
-        <div className="flex flex-col gap-[12px]">
+        <div className="flex flex-col gap-[16px]">
           {DAY_LABELS.map((day, dayIndex) => (
-            <div key={day} className="flex gap-[12px] items-center">
-              <div className="w-12 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right pr-4">
+            <div key={day} className="flex gap-[16px] items-center">
+              <div className="w-14 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right pr-6">
                 {dayIndex % 2 === 1 ? day : ''}
               </div>
               {weeks.map((week, weekIndex) => {
@@ -85,14 +84,14 @@ export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
                       delay: (weekIndex * 0.005) + (dayIndex * 0.002),
                       duration: 0.2
                     }}
-                    className="w-8 h-8 rounded-xl shadow-sm relative group cursor-help transition-all hover:scale-125 active:scale-90 z-10 border border-slate-100/10"
+                    className="w-10 h-10 rounded-2xl shadow-sm relative group cursor-help transition-all hover:scale-125 active:scale-90 z-10 border border-slate-100/10"
                     style={{ backgroundColor: color }}
                   >
                     {cell && cell.percentage !== -1 && (
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-5 py-3 bg-slate-900 text-white text-[10px] font-bold rounded-2xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap z-50 pointer-events-none shadow-2xl border border-white/10 translate-y-1 group-hover:translate-y-0">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-5 py-3 bg-white text-slate-900 text-[10px] font-bold rounded-2xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap z-50 pointer-events-none shadow-2xl border border-slate-100 translate-y-1 group-hover:translate-y-0">
                         <div className="text-slate-400 font-black uppercase tracking-widest text-[8px] mb-1.5">{format(parseISO(cell.date), 'EEEE, MMM dd')}</div>
                         <div className="text-sm font-black tracking-tight">{cell.percentage > 0 ? `${cell.percentage}% Participation` : 'No Classes'}</div>
-                        {cell.percentage > 0 && <div className={`text-[9px] font-black uppercase mt-1.5 ${cell.present ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {cell.percentage > 0 && <div className={`text-[9px] font-black uppercase mt-1.5 ${cell.present ? 'text-emerald-600' : 'text-red-600'}`}>
                           {cell.present ? 'Status: Verified Present' : 'Status: Recorded Absent'}
                         </div>}
                       </div>

@@ -249,7 +249,7 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
           </AnimatePresence>
 
           {timetable ? (
-            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="card border-slate-100 shadow-2xl overflow-hidden flex flex-col h-full bg-white">
+            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="card border-slate-100 shadow-2xl overflow-hidden flex flex-col h-full bg-white max-w-full">
               
               {/* Header Info */}
               <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/20">
@@ -301,7 +301,7 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
                           <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Matrix \ Timeline</span>
                         </th>
                         {timeSlots.map(slot => (
-                          <th key={slot.start} className="p-4 border-b border-slate-50 text-center bg-white min-w-[200px]">
+                          <th key={slot.start} className="p-4 border-b border-slate-50 text-center bg-white min-w-[160px]">
                             <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.15em] bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">{slot.start} — {slot.end}</span>
                           </th>
                         ))}

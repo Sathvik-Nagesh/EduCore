@@ -7,7 +7,7 @@ import {
 } from 'recharts'
 import PageWrapper from '../../components/layout/PageWrapper'
 import AnimatedCounter from '../../components/charts/AnimatedCounter'
-import { getAllAttendance, getAIStats } from '../../lib/supabase'
+import { getAllAttendance, getAIStats, getAllLeaves } from '../../lib/supabase'
 import { CustomTooltip, GRID_STYLE, AXIS_STYLE, SUBJECT_COLOR_MAP } from '../../lib/chartUtils'
 import { ADMIN_STATS } from '../../lib/mockData'
 
@@ -105,23 +105,100 @@ export default function AdminDashboard({ onLogout }: Props) {
   const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
   const stats = ADMIN_STATS
   const [aiData, setAIData] = useState<any[]>([])
+  const [attendance, setAttendance] = useState<any[]>([])
+  const [leaves, setLeaves] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    getAIStats().then(d => { if (d.length > 0) setAIData(d) }).catch(() => {})
+    Promise.all([
+      getAIStats(),
+      getAllAttendance(),
+      getAllLeaves()
+    ]).then(([ai, att, lv]) => {
+      setAIData(ai)
+      setAttendance(att)
+      setLeaves(lv.filter(l => l.status === 'pending'))
+      setIsLoading(false)
+    }).catch(err => {
+      console.error('Error fetching dashboard data:', err)
+      setIsLoading(false)
+    })
   }, [])
 
+  // Process At-Risk Students
+  const studentAttendanceMap: Record<string, { name: string; dept: string; attended: number; total: number }> = {}
+  attendance.forEach(record => {
+    const studentId = record.student_id
+    if (!studentAttendanceMap[studentId]) {
+      studentAttendanceMap[studentId] = {
+        name: record.profiles?.name || 'Unknown',
+        dept: record.profiles?.department || 'Gen',
+        attended: 0,
+        total: 0
+      }
+    }
+    studentAttendanceMap[studentId].total++
+    if (record.is_present) studentAttendanceMap[studentId].attended++
+  })
+
+  const realAtRisk = Object.values(studentAttendanceMap)
+    .map(s => ({ ...s, pct: Math.round((s.attended / s.total) * 100) }))
+    .filter(s => s.pct < 75)
+    .sort((a, b) => a.pct - b.pct)
+    .slice(0, 10)
+    .map(s => ({ ...s, size: 75 - s.pct }))
+
+  // Process AI Activity Trend
+  const activityMap: Record<string, { day: string; active: number; ai: number }> = {}
+  // Last 14 days
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const key = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    activityMap[key] = { day: key, active: 0, ai: 0 }
+  }
+
+  aiData.forEach(interaction => {
+    const d = new Date(interaction.created_at)
+    const key = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    if (activityMap[key]) activityMap[key].ai++
+  })
+
+  // Attendance density for "active"
+  attendance.forEach(record => {
+    const d = new Date(record.date)
+    const key = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    if (activityMap[key]) activityMap[key].active++
+  })
+
+  const realActivity = Object.values(activityMap)
+
+  // Process Scatter Data
+  const scatterMap: Record<string, { name: string; ai: number; attendance: number }> = {}
+  aiData.forEach(i => {
+    if (!scatterMap[i.student_id]) scatterMap[i.student_id] = { name: i.profiles?.name || 'Student', ai: 0, attendance: 0 }
+    scatterMap[i.student_id].ai++
+  })
+  Object.keys(scatterMap).forEach(sid => {
+    const att = studentAttendanceMap[sid]
+    if (att) scatterMap[sid].attendance = Math.round((att.attended / att.total) * 100)
+  })
+  const realScatter = Object.values(scatterMap)
+
   const kpis = [
-    { label: 'Enrollments', value: stats.totalStudents,   unit: '',  color: '#0F172A', icon: Users },
-    { label: 'Risk Indices',    value: AT_RISK.length,        unit: '',  color: '#EF4444', icon: AlertTriangle },
-    { label: 'AI Synthesis',    value: aiData.length || stats.aiInteractions, unit: '', color: '#8B5CF6', icon: Brain },
+    { label: 'Enrollments', value: Object.keys(studentAttendanceMap).length || stats.totalStudents,   unit: '',  color: '#0F172A', icon: Users },
+    { label: 'Risk Indices',    value: realAtRisk.length,        unit: '',  color: '#EF4444', icon: AlertTriangle },
+    { label: 'AI Synthesis',    value: aiData.length, unit: '', color: '#8B5CF6', icon: Brain },
     { label: 'Campus Avg',      value: stats.campusAttendance, unit: '%', color: '#10B981', icon: TrendingUp },
   ]
 
-  const PENDING_APPROVALS = [
-    { id: 1, type: 'Medical Leave', student: 'Rahul Verma', date: 'Oct 24, 2023', status: 'Pending Verification' },
-    { id: 2, type: 'Faculty Access', user: 'Dr. Sarah Wilson', date: 'Oct 25, 2023', status: 'Identity Check' },
-    { id: 3, type: 'Syllabus Update', subject: 'Machine Learning', date: 'Oct 26, 2023', status: 'Approval Required' }
-  ]
+  const PENDING_APPROVALS = leaves.map(l => ({
+    id: l.id,
+    type: l.type === 'medical' ? 'Medical Leave' : l.type === 'personal' ? 'Personal Leave' : 'Official Duty',
+    user: l.profiles?.name || 'Faculty',
+    date: new Date(l.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    status: 'Pending Review'
+  }))
 
   return (
     <PageWrapper role="admin" userName={user.name || 'Admin'} onLogout={onLogout}
@@ -155,9 +232,10 @@ export default function AdminDashboard({ onLogout }: Props) {
           transition={{ delay: 0.1 }} className="card p-8 lg:col-span-2 shadow-xl border-slate-100">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Behavioral Risk Matrix</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Attendance below 75% threshold</p>
-          <ResponsiveContainer width="100%" height={230}>
+          <div className="w-full h-[230px] min-h-[230px]">
+            <ResponsiveContainer width="100%" height="100%">
             <Treemap
-              data={AT_RISK.map(s => ({ ...s, size: 75 - s.pct }))}
+              data={realAtRisk.length > 0 ? realAtRisk : AT_RISK.map(s => ({ ...s, size: 75 - s.pct }))}
               dataKey="size"
               content={<TreemapContent />}
             >
@@ -173,6 +251,7 @@ export default function AdminDashboard({ onLogout }: Props) {
               }} />
             </Treemap>
           </ResponsiveContainer>
+        </div>
         </motion.div>
 
         {/* ── Campus Activity Line + Brush ─────────────────────── */}
@@ -180,8 +259,9 @@ export default function AdminDashboard({ onLogout }: Props) {
           transition={{ delay: 0.15 }} className="card p-8 lg:col-span-3 shadow-xl border-slate-100">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Campus Activity Synthesis</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Live utilization: Active users vs AI synthesized queries</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={ACTIVITY} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+          <div className="w-full h-[220px] min-h-[220px]">
+            <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={realActivity.length > 0 ? realActivity : ACTIVITY} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
               <XAxis dataKey="day" {...AXIS_STYLE} tick={{ ...AXIS_STYLE.tick, fontSize: 9 }} interval={4} />
               <YAxis {...AXIS_STYLE} hide />
@@ -195,6 +275,7 @@ export default function AdminDashboard({ onLogout }: Props) {
                 fill="#F8FAFC" />
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </motion.div>
       </div>
 
@@ -231,15 +312,16 @@ export default function AdminDashboard({ onLogout }: Props) {
           transition={{ delay: 0.25 }} className="card p-8 shadow-xl border-slate-100 lg:col-span-2">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Intelligence Correlation</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Cross-metric analysis: AI Engagement vs Student Attendance</p>
-          <ResponsiveContainer width="100%" height={260}>
+          <div className="w-full h-[260px] min-h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
               <XAxis type="number" dataKey="ai" name="AI Queries" {...AXIS_STYLE} hide />
               <YAxis type="number" dataKey="attendance" name="Attendance" {...AXIS_STYLE} domain={[45, 100]} hide />
               <ZAxis range={[100, 300]} />
               <Tooltip content={<ScatterTip />} cursor={{ stroke: 'rgba(0,0,0,0.05)' }} />
-              <Scatter data={SCATTER_DATA}>
-                {SCATTER_DATA.map((d, i) => (
+              <Scatter data={realScatter.length > 0 ? realScatter : SCATTER_DATA}>
+                {(realScatter.length > 0 ? realScatter : SCATTER_DATA).map((d, i) => (
                   <Cell key={i}
                     fill={d.attendance >= 75 ? '#10B981' : d.attendance >= 60 ? '#F59E0B' : '#EF4444'}
                     fillOpacity={0.9} />
@@ -247,6 +329,7 @@ export default function AdminDashboard({ onLogout }: Props) {
               </Scatter>
             </ScatterChart>
           </ResponsiveContainer>
+        </div>
           <div className="flex gap-6 mt-6 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 justify-center">
             <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm" /> High Perf</span>
             <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" /> Median</span>

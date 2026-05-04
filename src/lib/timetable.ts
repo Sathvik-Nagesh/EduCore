@@ -73,7 +73,6 @@ export function generateTimetable(
     const slots: string[] = []
     let elapsedSinceBreak = 0
     let t = startMin
-    
     while (t + classDuration <= endMin) {
       slots.push(minutesToTime(t))
       t += classDuration

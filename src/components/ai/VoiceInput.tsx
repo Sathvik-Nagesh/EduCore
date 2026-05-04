@@ -25,8 +25,8 @@ export default function VoiceInput({
       className={`
         p-3 rounded-xl flex-shrink-0 transition-all
         ${isListening
-          ? 'bg-red-500/20 text-red-400 border border-red-500/40 recording-active'
-          : 'bg-white/[0.04] text-white/30 border border-white/8 hover:text-white/60 hover:border-white/20'
+          ? 'bg-red-50 text-red-500 border border-red-200 shadow-lg shadow-red-100'
+          : 'bg-white text-slate-400 border border-slate-200 hover:text-slate-900 hover:border-slate-900 shadow-sm'
         }
       `}
     >

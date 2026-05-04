@@ -10,7 +10,8 @@ import VoiceInput from '../../components/ai/VoiceInput'
 import QuizMode from '../../components/ai/QuizMode'
 import { useAIChat } from '../../hooks/useAIChat'
 import { useVoice, speakText, stopSpeaking } from '../../hooks/useVoice'
-import { SUBJECTS, QUIZ_ANALYTICS } from '../../lib/mockData'
+import { SUBJECTS as MOCK_SUBJECTS, QUIZ_ANALYTICS } from '../../lib/mockData'
+import { getSubjects } from '../../lib/supabase'
 import { Target } from 'lucide-react'
 
 interface AIPageProps {
@@ -34,17 +35,27 @@ const PROVIDER_META: Record<string, { label: string; color: string; icon: typeof
 
 export default function AIPage({ onLogout }: AIPageProps) {
   const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
-  const [selectedSubjectId, setSelectedSubjectId] = useState('sub1')
+  const [subjects, setSubjects] = useState<any[]>(MOCK_SUBJECTS)
+  const [selectedSubjectId, setSelectedSubjectId] = useState(MOCK_SUBJECTS[0].id)
   const [inputValue, setInputValue] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [mode, setMode] = useState<'chat' | 'quiz' | 'analytics'>('chat')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  useEffect(() => {
+    getSubjects().then(res => {
+      if (res && res.length > 0) {
+        setSubjects(res)
+        setSelectedSubjectId(res[0].id)
+      }
+    })
+  }, [])
+
   const { messages, isLoading, streamingText, sendMessage, clearChat, repeatedTopic, dismissRepeatedTopic, lastProvider } = useAIChat()
   const { transcript, isListening, startListening, stopListening, resetTranscript, supported } = useVoice()
 
-  const selectedSubject = SUBJECTS.find(s => s.id === selectedSubjectId)
+  const selectedSubject = subjects.find(s => s.id === selectedSubjectId)
 
   // Live voice transcript → textarea (both interim and final)
   useEffect(() => {
@@ -103,7 +114,7 @@ export default function AIPage({ onLogout }: AIPageProps) {
         {/* Subject Tabs + Status */}
         <div className="flex items-center gap-3 flex-shrink-0 flex-wrap">
           <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-2xl overflow-x-auto flex-1 min-w-0 shadow-sm" style={{ scrollbarWidth: 'none' }}>
-            {SUBJECTS.map(s => (
+            {subjects.map(s => (
               <button key={s.id} onClick={() => { setSelectedSubjectId(s.id); clearChat() }}
                 className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex-shrink-0 ${
                   selectedSubjectId === s.id ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
@@ -259,7 +270,7 @@ export default function AIPage({ onLogout }: AIPageProps) {
                       role={msg.role}
                       content={msg.content}
                       index={i}
-                      typewrite={msg.role === 'assistant' && i === messages.length - 1}
+                      typewrite={false}
                     />
                     {msg.role === 'assistant' && (
                       <div className="flex mt-1.5 ml-11">

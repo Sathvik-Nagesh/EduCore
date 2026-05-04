@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react'
 import type { ChatMessage } from '../lib/types'
 import { callAI, buildStudySystemPrompt } from '../lib/nvidia'
 import { COURSE_MATERIALS } from '../lib/mockData'
+import { insertAIInteraction } from '../lib/supabase'
 
 // ─── Mock Fallback Answers ────────────────────────────────────────────────────
 const MOCK_ANSWERS = [
@@ -149,6 +150,18 @@ export function useAIChat() {
         setStreamingText(prev => prev + token)
       })
       setLastProvider(provider)
+
+      // Log to Supabase
+      const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
+      if (user.id) {
+        await insertAIInteraction({
+          student_id: user.id,
+          subject_id: subjectId,
+          query: content,
+          response_length: fullResponse.length,
+          provider: provider as 'nvidia' | 'gemini' | 'mock'
+        })
+      }
     } catch {
       fullResponse = "I'm unable to respond right now. Please try again in a moment."
     }

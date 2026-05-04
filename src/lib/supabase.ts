@@ -176,6 +176,14 @@ export async function getTimetable(facultyId?: string) {
   return data ?? []
 }
 
+export async function uploadStudyMaterial(payload: Omit<StudyMaterial, 'id' | 'created_at' | 'downloads'>) {
+  const { data, error } = await supabase.from('study_materials').insert({
+    ...payload,
+    downloads: 0
+  }).select().single()
+  return { data, error }
+}
+
 // ── Admin data fetchers ───────────────────────────────────────
 export async function getAllProfiles() {
   const { data } = await supabase.from('profiles').select('*').order('role')

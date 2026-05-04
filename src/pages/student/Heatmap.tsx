@@ -86,7 +86,7 @@ export default function HeatmapPage({ onLogout }: HeatmapPageProps) {
                     animate={{ width: `${subject.percentage}%` }}
                     transition={{ duration: 1, delay: i * 0.1 + 0.2, ease: 'easeOut' }}
                   >
-                    <span className="text-white text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
+                    <span className="text-slate-900 text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
                       {subject.attended}/{subject.total} classes
                     </span>
                   </motion.div>

@@ -1,9 +1,10 @@
-import { motion } from 'framer-motion'
 import { Brain } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
 import EngagementBar from '../../components/charts/EngagementBar'
-import { AI_INTERACTIONS, getAIEngagementBySubject } from '../../lib/mockData'
+import { AI_INTERACTIONS as MOCK_INTERACTIONS, getAIEngagementBySubject } from '../../lib/mockData'
+import { getAIStats } from '../../lib/supabase'
 import AnimatedCounter from '../../components/charts/AnimatedCounter'
+import { useEffect, useState } from 'react'
 
 interface AIEngagementPageProps {
   onLogout: () => void
@@ -11,9 +12,28 @@ interface AIEngagementPageProps {
 
 export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
   const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
-  const engagementData = getAIEngagementBySubject()
-  const totalInteractions = AI_INTERACTIONS.length
-  const uniqueStudents = new Set(AI_INTERACTIONS.map(i => i.studentId)).size
+  const [interactions, setInteractions] = useState<any[]>(MOCK_INTERACTIONS)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    getAIStats().then(data => {
+      if (data && data.length > 0) setInteractions(data)
+      setIsLoading(false)
+    }).catch(() => setIsLoading(false))
+  }, [])
+
+  // Process data
+  const totalInteractions = interactions.length
+  const uniqueStudents = new Set(interactions.map(i => i.student_id || i.studentId)).size
+  
+  const subjectMap: Record<string, number> = {}
+  interactions.forEach(i => {
+    const sname = i.subjects?.name || i.subjectName || 'General'
+    subjectMap[sname] = (subjectMap[sname] || 0) + 1
+  })
+  const engagementData = Object.entries(subjectMap)
+    .map(([subject, count]) => ({ subject, count }))
+    .sort((a, b) => b.count - a.count)
 
   return (
     <PageWrapper
@@ -73,7 +93,7 @@ export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
       >
         <h2 className="font-heading text-lg font-bold text-navy-800 mb-4">Recent AI Interactions</h2>
         <div className="space-y-2">
-          {AI_INTERACTIONS.slice(-8).reverse().map((interaction, i) => (
+          {interactions.slice(0, 8).map((interaction, i) => (
             <motion.div
               key={interaction.id}
               initial={{ opacity: 0, x: -10 }}
@@ -86,9 +106,9 @@ export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-slate-900 text-sm font-black italic tracking-tight truncate leading-tight">"{interaction.query}"</p>
-                <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] mt-1">{interaction.subjectName}</p>
+                <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] mt-1">{interaction.subjects?.name || interaction.subjectName || 'General'}</p>
               </div>
-              <span className="text-slate-300 font-black text-[10px] uppercase tracking-[0.2em]">{new Date(interaction.createdAt).toLocaleDateString()}</span>
+              <span className="text-slate-300 font-black text-[10px] uppercase tracking-[0.2em]">{new Date(interaction.created_at || interaction.createdAt).toLocaleDateString()}</span>
             </motion.div>
           ))}
         </div>
