@@ -69,10 +69,7 @@ export default function Sidebar({ role, userName, onLogout }: SidebarProps) {
   }
 
   return (
-    <motion.aside
-      initial={{ x: -280 }}
-      animate={{ x: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+    <aside
       className="w-64 h-screen flex flex-col fixed left-0 top-0 z-30"
       style={{
         background: 'linear-gradient(180deg, #13162A 0%, #0F1117 100%)',
@@ -137,6 +134,6 @@ export default function Sidebar({ role, userName, onLogout }: SidebarProps) {
           <span>Sign Out</span>
         </button>
       </div>
-    </motion.aside>
+    </aside>
   )
 }

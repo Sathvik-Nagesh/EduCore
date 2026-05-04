@@ -4,6 +4,7 @@ import { CheckSquare, Users, Check, Search, X, UserX } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
 import toast from 'react-hot-toast'
 import { TODAYS_CLASSES } from '../../lib/mockData'
+import { addToQueue } from '../../lib/offlineSync'
 
 interface MarkAttendanceProps {
   onLogout: () => void
@@ -53,10 +54,19 @@ export default function MarkAttendance({ onLogout }: MarkAttendanceProps) {
 
   const handleSubmit = async () => {
     setSubmitting(true)
-    await new Promise(res => setTimeout(res, 1200))
+    await new Promise(res => setTimeout(res, 800))
+    
+    if (!navigator.onLine) {
+      await addToQueue(selectedClass, Array.from(absent));
+      toast.success('Offline mode: Attendance queued for sync 🔄');
+    } else {
+      // Simulate API call
+      await new Promise(res => setTimeout(res, 400))
+      toast.success(`Attendance submitted! ${presentCount}/${totalCount} present ✅`)
+    }
+    
     setSubmitted(prev => ({ ...prev, [selectedClass]: true }))
     setSubmitting(false)
-    toast.success(`Attendance submitted! ${presentCount}/${totalCount} present ✅`)
   }
 
   return (

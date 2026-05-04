@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,14 +9,14 @@
    ============================================ */
 
 :root {
-  --navy: #0F1117;
-  --charcoal: #1A1D2E;
-  --electric-blue: #4F8EF7;
+  --navy: #090A0F;
+  --charcoal: #12141D;
+  --electric-blue: #3B82F6;
   --amber: #F59E0B;
   --emerald: #10B981;
   --danger: #EF4444;
-  --surface: #1E2130;
-  --surface-raised: #252840;
+  --surface: #1A1D27;
+  --surface-raised: #222634;
   --border: rgba(255, 255, 255, 0.08);
   --text-primary: #F0F4FF;
   --text-secondary: #8892AA;
@@ -32,14 +34,14 @@ html {
 body {
   background-color: var(--navy);
   color: var(--text-primary);
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Syne', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* ============================================
@@ -90,21 +92,19 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--charcoal);
   border: 1px solid var(--border);
   border-radius: 1rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
 }
 
 .card:hover {
-  border-color: rgba(79, 142, 247, 0.2);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(79, 142, 247, 0.08);
-  transform: translateY(-1px);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .card-glow {
   background: var(--charcoal);
-  border: 1px solid rgba(79, 142, 247, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 1rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(79, 142, 247, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* ============================================
@@ -112,22 +112,20 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .btn-primary {
-  background: linear-gradient(135deg, #4F8EF7, #3B7AE8);
+  background: var(--electric-blue);
   color: white;
   border: none;
   border-radius: 0.75rem;
   padding: 0.625rem 1.5rem;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(79, 142, 247, 0.3);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #5A99FF, #4F8EF7);
-  box-shadow: 0 6px 20px rgba(79, 142, 247, 0.5);
-  transform: translateY(-1px);
+  background: #2563EB;
 }
 
 .btn-ghost {
@@ -136,8 +134,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   padding: 0.625rem 1.5rem;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -251,7 +249,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   color: var(--text-primary);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: all 0.2s ease;
   width: 100%;
   padding: 0.625rem 1rem;

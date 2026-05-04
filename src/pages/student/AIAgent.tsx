@@ -10,7 +10,8 @@ import VoiceInput from '../../components/ai/VoiceInput'
 import QuizMode from '../../components/ai/QuizMode'
 import { useAIChat } from '../../hooks/useAIChat'
 import { useVoice, speakText, stopSpeaking } from '../../hooks/useVoice'
-import { SUBJECTS } from '../../lib/mockData'
+import { SUBJECTS, QUIZ_ANALYTICS } from '../../lib/mockData'
+import { Target } from 'lucide-react'
 
 interface AIPageProps {
   onLogout: () => void
@@ -36,7 +37,7 @@ export default function AIPage({ onLogout }: AIPageProps) {
   const [selectedSubjectId, setSelectedSubjectId] = useState('sub1')
   const [inputValue, setInputValue] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [mode, setMode] = useState<'chat' | 'quiz'>('chat')
+  const [mode, setMode] = useState<'chat' | 'quiz' | 'analytics'>('chat')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -126,6 +127,12 @@ export default function AIPage({ onLogout }: AIPageProps) {
               }`}>
               <Trophy className="w-3.5 h-3.5" /> Quiz
             </button>
+            <button onClick={() => setMode('analytics')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                mode === 'analytics' ? 'bg-emerald-500 text-white' : 'text-white/40 hover:text-white'
+              }`}>
+              <Target className="w-3.5 h-3.5" /> Analytics
+            </button>
           </div>
 
           {provider && mode === 'chat' && (
@@ -148,6 +155,37 @@ export default function AIPage({ onLogout }: AIPageProps) {
           <div className="flex-1 overflow-y-auto rounded-2xl border border-white/8 p-4"
             style={{ background: 'linear-gradient(180deg, rgba(26,29,46,0.9) 0%, rgba(15,17,23,0.95) 100%)' }}>
             <QuizMode subjectName={selectedSubject?.name ?? 'General'} onClose={() => setMode('chat')} />
+          </div>
+        )}
+
+        {/* Analytics Mode */}
+        {mode === 'analytics' && (
+          <div className="flex-1 overflow-y-auto rounded-2xl border border-white/8 p-6"
+            style={{ background: 'var(--surface)' }}>
+            <h3 className="text-xl font-heading font-bold text-white mb-6">Learning Analytics & Suggestions</h3>
+            
+            <div className="mb-8 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+              <h4 className="flex items-center gap-2 text-sm font-semibold text-emerald-400 mb-2">
+                <Sparkles className="w-4 h-4" /> AI Insight
+              </h4>
+              <p className="text-sm text-white/80 leading-relaxed">{QUIZ_ANALYTICS.insights}</p>
+            </div>
+
+            <h4 className="text-sm font-semibold text-white/60 mb-4 uppercase tracking-wider">Identified Weak Topics</h4>
+            <div className="space-y-4">
+              {QUIZ_ANALYTICS.weakTopics.map((topic, i) => (
+                <div key={i} className="p-4 rounded-xl border border-white/8 bg-white/[0.02]">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <span className="text-xs font-bold text-electric-blue px-2 py-0.5 rounded-full border border-electric-blue/20 bg-electric-blue/10 mr-2">{topic.subject}</span>
+                      <span className="font-semibold text-white">{topic.topic}</span>
+                    </div>
+                    <span className="text-xs text-red-400 font-bold px-2 py-1 bg-red-400/10 rounded-lg">{topic.mistakes} mistakes</span>
+                  </div>
+                  <p className="text-sm text-white/50">{topic.suggestion}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

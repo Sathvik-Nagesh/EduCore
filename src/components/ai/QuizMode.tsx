@@ -15,7 +15,7 @@ interface QuizModeProps {
 }
 
 // Parse quiz from AI text response
-function parseQuizFromText(text: string): QuizQuestion[] {
+function parseQuizFromText(text: string, subjectName: string): QuizQuestion[] {
   const questions: QuizQuestion[] = []
   // Match blocks like: Q1. ... a) ... b) ... Answer: B ... Explanation: ...
   const blocks = text.split(/Q\d+\.|(?=\*\*Q\d+)/).filter(b => b.trim().length > 10)
@@ -53,9 +53,6 @@ function parseQuizFromText(text: string): QuizQuestion[] {
   }
 
   return questions
-
-  // reference to avoid TS unused
-  void subjectName
 }
 
 // Mock quiz generator
@@ -113,7 +110,7 @@ export default function QuizMode({ subjectName, onClose }: QuizModeProps) {
     setPhase('loading')
     // Simulate AI generating quiz (use mock)
     await new Promise(r => setTimeout(r, 1400))
-    const parsed = parseQuizFromText(MOCK_QUIZ_RESPONSE)
+    const parsed = parseQuizFromText(MOCK_QUIZ_RESPONSE, subjectName)
     setQuestions(parsed)
     setCurrent(0)
     setSelected(null)

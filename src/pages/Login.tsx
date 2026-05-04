@@ -31,7 +31,7 @@ export default function Login() {
       return
     }
     localStorage.setItem('educore_user', JSON.stringify({ email, role: creds.role, name: creds.name }))
-    toast.success(`Welcome, ${creds.name.split(' ')[0]}!`)
+    toast.success(`Welcome back, ${creds.name.split(' ')[0]}!`)
     setLoading(false)
     navigate(`/${creds.role}`)
   }
@@ -40,116 +40,120 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-navy flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Orbs */}
       <div className="absolute inset-0 bg-grid opacity-25 pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-electric-blue/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-electric-blue/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
 
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-[420px]"
+        className="relative z-10 w-full max-w-[440px]"
       >
-        {/* Logo */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-electric-blue to-emerald-500 shadow-xl shadow-electric-blue/20 mb-4">
-            <GraduationCap className="w-7 h-7 text-white" />
-          </div>
-          <h1 className="font-heading text-3xl font-black text-white">EduCore AI</h1>
-          <p className="text-white/40 text-sm mt-1">Your intelligent campus platform</p>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <motion.div 
+            initial={{ scale: 0.8 }} animate={{ scale: 1 }}
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-electric-blue to-emerald-500 shadow-2xl shadow-electric-blue/20 mb-6">
+            <GraduationCap className="w-8 h-8 text-white" />
+          </motion.div>
+          <h1 className="font-heading text-4xl font-black text-white tracking-tight">EduCore AI</h1>
+          <p className="text-white/40 text-sm mt-2 font-medium">The intelligence behind your academic success</p>
         </div>
 
-        {/* Card */}
-        <div className="card px-7 py-6 border-white/10 bg-white/[0.03] shadow-2xl backdrop-blur-xl">
-          <form onSubmit={handleLogin} className="space-y-4">
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-white/35">Email</label>
+        {/* Auth Card */}
+        <div className="card px-8 py-8 border-white/10 bg-white/[0.03] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/40 ml-1">Email Address</label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-electric-blue transition-colors" />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors text-white/20 group-focus-within:text-electric-blue">
+                  <Mail className="w-5 h-5" />
+                </div>
                 <input
                   type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="your@email.com" required
-                  className="w-full h-11 bg-white/[0.05] border border-white/10 rounded-xl pl-10 pr-4 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-electric-blue/50 focus:bg-white/[0.08] transition-all"
+                  placeholder="name@university.edu" required
+                  className="w-full h-12 bg-white/[0.05] border border-white/10 rounded-xl pl-12 pr-4 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-electric-blue/50 focus:bg-white/[0.08] transition-all ring-0 focus:ring-4 focus:ring-electric-blue/5"
                 />
               </div>
             </div>
 
-            {/* Password */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-white/35">Password</label>
-                <button type="button" className="text-[10px] text-electric-blue hover:underline">Forgot?</button>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between ml-1">
+                <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/40">Password</label>
+                <button type="button" className="text-[11px] font-bold text-electric-blue/60 hover:text-electric-blue transition-colors">Forgot Password?</button>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-electric-blue transition-colors" />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors text-white/20 group-focus-within:text-electric-blue">
+                  <Lock className="w-5 h-5" />
+                </div>
                 <input
                   type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••" required
-                  className="w-full h-11 bg-white/[0.05] border border-white/10 rounded-xl pl-10 pr-10 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-electric-blue/50 focus:bg-white/[0.08] transition-all"
+                  className="w-full h-12 bg-white/[0.05] border border-white/10 rounded-xl pl-12 pr-12 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-electric-blue/50 focus:bg-white/[0.08] transition-all ring-0 focus:ring-4 focus:ring-electric-blue/5"
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50">
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 transition-colors">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Remember me */}
-            <label className="flex items-center gap-2.5 cursor-pointer group w-fit">
-              <div onClick={() => setRememberMe(!rememberMe)}
-                className={`w-4.5 h-4.5 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${rememberMe ? 'bg-electric-blue border-electric-blue' : 'border-white/15 group-hover:border-white/30'}`}>
-                {rememberMe && <CheckCircle2 className="w-3 h-3 text-white" />}
-              </div>
-              <span className="text-xs text-white/40">Stay signed in</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-3 cursor-pointer group select-none">
+                <div onClick={() => setRememberMe(!rememberMe)}
+                  className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${rememberMe ? 'bg-electric-blue border-electric-blue' : 'border-white/15 group-hover:border-white/30'}`}>
+                  {rememberMe && <CheckCircle2 className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                </div>
+                <span className="text-xs font-semibold text-white/40 group-hover:text-white/60 transition-colors">Stay signed in</span>
+              </label>
+            </div>
 
             <AnimatePresence>
               {error && (
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2 text-center">
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                  className="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-center">
                   {error}
-                </motion.p>
+                </motion.div>
               )}
             </AnimatePresence>
 
             <button type="submit" disabled={loading}
-              className="w-full h-11 bg-electric-blue hover:bg-blue-500 disabled:opacity-50 text-white font-bold rounded-xl shadow-lg shadow-electric-blue/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] text-sm">
+              className="w-full h-12 bg-electric-blue hover:bg-blue-500 disabled:opacity-50 text-white font-black rounded-xl shadow-xl shadow-electric-blue/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] text-sm uppercase tracking-wider">
               {loading
-                ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                : <><span>Sign In</span><ArrowRight className="w-4 h-4" /></>}
+                ? <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                : <><span>Sign In to EduCore</span><ArrowRight className="w-5 h-5" /></>}
             </button>
           </form>
 
-          {/* Demo accounts */}
-          <div className="mt-5">
-            <div className="relative mb-4">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5" /></div>
-              <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-white/20 font-bold">
-                <span className="bg-[#1a1d2e] px-3">Demo Access</span>
-              </div>
-            </div>
-            <div className="space-y-2">
+          {/* Quick Access Grid */}
+          <div className="mt-8 pt-6 border-t border-white/5">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 text-center mb-5">Quick Demo Access</p>
+            <div className="grid grid-cols-1 gap-2.5">
               {Object.entries(DEMO_CREDENTIALS).map(([em, info]) => (
                 <button key={em} onClick={() => quickLogin(em)}
-                  className="group w-full flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/15 hover:bg-white/[0.05] transition-all text-left">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0
+                  className="group relative flex items-center gap-3.5 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/20 hover:bg-white/[0.06] transition-all text-left">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0 transition-transform group-hover:scale-105
                     ${info.role === 'student' ? 'bg-blue-500/20 text-blue-400' : info.role === 'faculty' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
                     {info.name.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-white group-hover:text-electric-blue transition-colors truncate">{info.name}</p>
-                    <p className="text-[10px] text-white/25 truncate">{info.dept}</p>
+                    <p className="text-xs font-black text-white group-hover:text-electric-blue transition-colors truncate uppercase tracking-tight">{info.name}</p>
+                    <p className="text-[10px] font-bold text-white/30 truncate uppercase tracking-tighter">{info.dept}</p>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowRight className="w-4 h-4 text-electric-blue" />
+                  </div>
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Footer links */}
-        <div className="mt-4 flex justify-center gap-5 text-[10px] text-white/20">
-          <a href="/privacy" className="hover:text-white/50 transition-colors">Privacy</a>
-          <a href="/terms" className="hover:text-white/50 transition-colors">Terms</a>
+        {/* Footer */}
+        <div className="mt-8 flex justify-center gap-8">
+          <a href="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-white/60 transition-colors">Privacy Policy</a>
+          <a href="/terms" className="text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-white/60 transition-colors">Terms of Service</a>
         </div>
       </motion.div>
     </div>

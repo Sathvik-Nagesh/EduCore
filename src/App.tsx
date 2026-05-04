@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
-import { Toaster } from 'react-hot-toast'
+import { Toaster, toast } from 'react-hot-toast'
 import CookieConsent from './components/layout/CookieConsent'
+import { useEffect } from 'react'
+import { getQueue, clearQueueItem } from './lib/offlineSync'
 
 // Pages
 import Landing from './pages/Landing'
@@ -61,6 +63,34 @@ function AppRoutes() {
     localStorage.removeItem('educore_user')
     navigate('/login')
   }
+
+  useEffect(() => {
+    const handleOnline = async () => {
+      try {
+        const queue = await getQueue();
+        if (queue && queue.length > 0) {
+          toast.loading(`Syncing ${queue.length} offline items...`, { id: 'offline-sync' });
+          for (const item of queue) {
+            // Here you would normally push to Supabase
+            // await supabase.from('attendance').insert(...)
+            await new Promise(r => setTimeout(r, 400)); 
+            await clearQueueItem(item.id);
+          }
+          toast.success('Offline data synced successfully! ✅', { id: 'offline-sync' });
+        }
+      } catch (err) {
+        console.error('Failed to sync offline queue', err);
+      }
+    };
+    
+    window.addEventListener('online', handleOnline);
+    // Attempt sync on initial load if online
+    if (navigator.onLine) {
+      handleOnline();
+    }
+    
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
 
   return (
     <Routes>

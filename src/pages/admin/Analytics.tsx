@@ -4,6 +4,13 @@ import TrendChart from '../../components/charts/TrendChart'
 import EngagementBar from '../../components/charts/EngagementBar'
 import { TREND_DATA, DEPARTMENT_ATTENDANCE, getAIEngagementBySubject } from '../../lib/mockData'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts'
+import { AlertCircle, TrendingDown, Clock, Search } from 'lucide-react'
+
+const ATTENDANCE_PATTERNS = [
+  { id: 1, type: 'Time-based', pattern: 'Monday First Hour Avoidance', description: '42% drop in attendance for CSE-A Monday 9:00 AM slots over the last 4 weeks.', severity: 'High', action: 'Notify Faculty' },
+  { id: 2, type: 'Subject-specific', pattern: 'Compiler Design Friday Afternoons', description: 'Consistent 30% absence rate for Friday 3:00 PM labs.', severity: 'Medium', action: 'Investigate' },
+  { id: 3, type: 'Cohort', pattern: 'Lateral Entry Students', description: 'Overall 15% lower attendance rate compared to regular cohort in Mathematics IV.', severity: 'Medium', action: 'Schedule Mentorship' }
+]
 
 interface AnalyticsPageProps {
   onLogout: () => void
@@ -40,6 +47,37 @@ export default function AnalyticsPage({ onLogout }: AnalyticsPageProps) {
             Campus Attendance — Last 30 Days
           </h2>
           <TrendChart data={TREND_DATA} height={250} />
+        </motion.div>
+
+        {/* Attendance Pattern Analysis */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card p-6">
+          <h2 className="font-heading text-base font-semibold text-white mb-4 flex items-center gap-2">
+            <Search className="w-5 h-5 text-purple-400" /> Attendance Pattern Analysis
+          </h2>
+          <p className="text-sm text-white/50 mb-4">AI-driven anomaly detection across schedules and cohorts.</p>
+          <div className="space-y-3">
+            {ATTENDANCE_PATTERNS.map((pattern) => (
+              <div key={pattern.id} className="p-4 rounded-xl border border-white/8 bg-white/[0.02] flex items-start gap-4">
+                <div className={`p-2 rounded-lg flex-shrink-0 ${
+                  pattern.severity === 'High' ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-400'
+                }`}>
+                  {pattern.type === 'Time-based' ? <Clock className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-white text-sm">{pattern.pattern}</h3>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                      pattern.severity === 'High' ? 'border-red-500/30 text-red-400' : 'border-amber-500/30 text-amber-400'
+                    }`}>{pattern.severity} Priority</span>
+                  </div>
+                  <p className="text-xs text-white/60 mb-2">{pattern.description}</p>
+                </div>
+                <button className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold rounded-lg border border-white/10 text-white/70 hover:bg-white/5 transition-colors">
+                  {pattern.action}
+                </button>
+              </div>
+            ))}
+          </div>
         </motion.div>
 
         {/* Department Comparison */}

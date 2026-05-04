@@ -160,6 +160,13 @@ export const CAMPUS_METRICS = {
   aiSessionsToday: 142,
 }
 
+export const ADMIN_STATS = {
+  totalStudents: 847,
+  campusAttendance: 74.2,
+  aiInteractions: 1254,
+  facultyActive: 18,
+}
+
 // ============================================
 // DEPARTMENT ATTENDANCE (for admin charts)
 // ============================================
@@ -223,6 +230,13 @@ export const FACULTIES: Faculty[] = [
   { id: 'fac2', name: 'Prof. Rahul Mehta', email: 'rahul@educore.in', department: 'CSE', subjects: ['Data Structures', 'Machine Learning'], classesScheduled: 52, classesTaken: 50, leaveDays: 1 },
   { id: 'fac3', name: 'Dr. Anita Rao', email: 'anita@educore.in', department: 'CSE', subjects: ['Computer Networks'], classesScheduled: 36, classesTaken: 30, leaveDays: 5 },
 ]
+
+export const FACULTY_STATS = {
+  totalStudents: 142,
+  classesTaken: 92,
+  avgAttendance: 76.4,
+  engagementScore: 84,
+}
 
 // ============================================
 // LEAVE REQUESTS
@@ -438,4 +452,37 @@ export const STUDY_MATERIALS: StudyMaterial[] = [
   // ML
   { id: 'm13', subjectId: 'sub5', subjectCode: 'ML',   title: 'Linear Regression',   description: 'Gradient descent, cost function, regularization — with Python code.', fileType: 'pdf', fileSize: '3.8 MB', uploadedBy: 'Prof. Rahul Mehta', uploadedAt: '2026-04-29', chapter: 'Chapter 2', downloads: 334, pages: 58 },
   { id: 'm14', subjectId: 'sub5', subjectCode: 'ML',   title: 'Neural Networks Intro', description: 'Perceptron, activation functions, backpropagation explained visually.', fileType: 'ppt', fileSize: '5.1 MB', uploadedBy: 'Prof. Rahul Mehta', uploadedAt: '2026-05-03', chapter: 'Chapter 5', downloads: 412 },
+]
+
+// ============================================
+// AI LEARNING ANALYTICS (Weak topics & Insights)
+// ============================================
+
+export const QUIZ_ANALYTICS = {
+  weakTopics: [
+    { topic: 'BCNF Normalization', subject: 'DBMS', mistakes: 4, suggestion: 'Review dependency preservation and lossless decomposition.' },
+    { topic: 'Subnet Masking', subject: 'CN', mistakes: 3, suggestion: 'Practice VLSM calculations using Chapter 3 formulas.' },
+    { topic: 'Banker\'s Algorithm', subject: 'OS', mistakes: 2, suggestion: 'Focus on resource allocation graph concepts.' }
+  ],
+  insights: "You are consistently struggling with calculation-based questions in Computer Networks. I recommend scheduling a targeted revision session for Subnetting."
+}
+
+// ============================================
+// ASSIGNMENTS & DEADLINES
+// ============================================
+
+export const ASSIGNMENTS = [
+  { id: 'ass1', subject: 'DBMS', title: 'ER Diagram Case Study', dueDate: '2026-05-10T23:59:59Z', status: 'Pending', priority: 'High' },
+  { id: 'ass2', subject: 'OS', title: 'Process Scheduling Simulator', dueDate: '2026-05-15T23:59:59Z', status: 'Submitted', priority: 'Medium' },
+  { id: 'ass3', subject: 'CN', title: 'Packet Tracer Lab', dueDate: '2026-05-05T23:59:59Z', status: 'Late', priority: 'High' },
+]
+
+// ============================================
+// ANNOUNCEMENTS
+// ============================================
+
+export const ANNOUNCEMENTS = [
+  { id: 'ann1', title: 'Campus Hackathon 2026', content: 'Registrations open for the annual hackathon. Max team size: 4.', date: '2026-05-01T10:00:00Z', priority: 'High' },
+  { id: 'ann2', title: 'Library Hours Extended', content: 'Library will remain open until 11 PM during exam weeks.', date: '2026-04-28T14:30:00Z', priority: 'Normal' },
+  { id: 'ann3', title: 'Maintenance Downtime', content: 'EduCore portals will be down for maintenance on Sunday 2AM-4AM.', date: '2026-05-03T09:00:00Z', priority: 'Medium' },
 ]
