@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Users, Brain, TrendingUp, AlertTriangle } from 'lucide-react'
+import { Users, Brain, TrendingUp, AlertTriangle, CheckCircle, Clock, ChevronRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import {
   ResponsiveContainer, Treemap, ScatterChart, Scatter, XAxis, YAxis,
   CartesianGrid, Tooltip, LineChart, Line, Brush, ZAxis, Cell,
@@ -20,8 +21,7 @@ const TreemapContent = (props: any) => {
   const { x, y, width, height, name, pct, dept } = props
   if (width < 30 || height < 20) return null
   const col = DEPT_COLORS[dept] || '#4F8EF7'
-  const words = name.split(' ')
-  const isTooWide = name.length > 10 && width < 80
+  const isTooSmall = width < 60 || height < 40
   
   return (
     <g>
@@ -29,21 +29,14 @@ const TreemapContent = (props: any) => {
         style={{ fill: 'white', stroke: '#F1F5F9', strokeWidth: 2 }} />
       <rect x={x + 4} y={y + 4} width={width - 8} height={height - 8} rx={8}
         style={{ fill: `${col}10`, stroke: col, strokeWidth: 1.5, strokeOpacity: 0.3 }} />
-      {width > 40 && height > 30 && (
+      {!isTooSmall && (
         <>
-          {isTooWide ? (
-            <>
-              <text x={x + width / 2} y={y + height / 2 - 8} textAnchor="middle"
-                style={{ fill: '#0F172A', fontSize: 9, fontWeight: 900, textTransform: 'uppercase' }}>{words[0]}</text>
-              <text x={x + width / 2} y={y + height / 2 + 2} textAnchor="middle"
-                style={{ fill: '#0F172A', fontSize: 9, fontWeight: 900, textTransform: 'uppercase' }}>{words.slice(1).join(' ')}</text>
-            </>
-          ) : (
-            <text x={x + width / 2} y={y + height / 2 - 4} textAnchor="middle"
-              style={{ fill: '#0F172A', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{name}</text>
-          )}
-          <text x={x + width / 2} y={y + height / 2 + 14} textAnchor="middle"
-            style={{ fill: col, fontSize: 11, fontWeight: 800 }}>{pct}%</text>
+          <foreignObject x={x + 10} y={y + 10} width={width - 20} height={height - 20}>
+            <div className="h-full flex flex-col items-center justify-center text-center overflow-hidden">
+              <span className="text-[9px] font-black text-slate-900 uppercase tracking-tight leading-none break-words mb-1 w-full">{name}</span>
+              <span className="text-[12px] font-black" style={{ color: col }}>{pct}%</span>
+            </div>
+          </foreignObject>
         </>
       )}
     </g>
@@ -103,6 +96,7 @@ const ScatterTip = ({ active, payload }: any) => {
 
 export default function AdminDashboard({ onLogout }: Props) {
   const user = JSON.parse(localStorage.getItem('educore_user') || '{}')
+  const navigate = useNavigate()
   const stats = ADMIN_STATS
   const [aiData, setAIData] = useState<any[]>([])
   const [attendance, setAttendance] = useState<any[]>([])
@@ -188,7 +182,7 @@ export default function AdminDashboard({ onLogout }: Props) {
   const kpis = [
     { label: 'Enrollments', value: Object.keys(studentAttendanceMap).length || 1420,   unit: '',  color: '#0F172A', icon: Users },
     { label: 'Risk Indices',    value: realAtRisk.length || 7,        unit: '',  color: '#EF4444', icon: AlertTriangle },
-    { label: 'AI Synthesis',    value: aiData.length || 24, unit: '', color: '#8B5CF6', icon: Brain },
+    { label: 'AI Synthesis',    value: Math.max(aiData.length, 24), unit: '', color: '#8B5CF6', icon: Brain },
     { label: 'Campus Avg',      value: 82, unit: '%', color: '#10B981', icon: TrendingUp },
   ]
 
@@ -232,7 +226,7 @@ export default function AdminDashboard({ onLogout }: Props) {
           transition={{ delay: 0.1 }} className="card p-8 lg:col-span-2 shadow-xl border-slate-100">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Behavioral Risk Matrix</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Attendance below 75% threshold</p>
-          <div className="w-full h-[230px] min-h-[230px]">
+          <div className="w-full" style={{ height: '240px', minHeight: '240px' }}>
             <ResponsiveContainer width="100%" height="100%">
             <Treemap
               data={realAtRisk.length > 0 ? realAtRisk : AT_RISK.map(s => ({ ...s, size: 75 - s.pct }))}
@@ -259,7 +253,7 @@ export default function AdminDashboard({ onLogout }: Props) {
           transition={{ delay: 0.15 }} className="card p-8 lg:col-span-3 shadow-xl border-slate-100">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Campus Activity Synthesis</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Live utilization: Active users vs AI synthesized queries</p>
-          <div className="w-full h-[220px] min-h-[220px]">
+          <div className="w-full" style={{ height: '240px', minHeight: '240px' }}>
             <ResponsiveContainer width="100%" height="100%">
             <LineChart data={realActivity.length > 0 ? realActivity : ACTIVITY} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
@@ -312,7 +306,7 @@ export default function AdminDashboard({ onLogout }: Props) {
           transition={{ delay: 0.25 }} className="card p-8 shadow-xl border-slate-100 lg:col-span-2">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Intelligence Correlation</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Cross-metric analysis: AI Engagement vs Student Attendance</p>
-          <div className="w-full h-[260px] min-h-[260px]">
+          <div className="w-full" style={{ height: '260px', minHeight: '260px' }}>
             <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
@@ -335,6 +329,52 @@ export default function AdminDashboard({ onLogout }: Props) {
             <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" /> Median</span>
             <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" /> Critical</span>
           </div>
+        </motion.div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-5 mb-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="card p-8 shadow-xl border-slate-100">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight">Pending Approval Requests</h3>
+            <span className="badge-warning font-black">{PENDING_APPROVALS.length} Pending</span>
+          </div>
+          {PENDING_APPROVALS.length === 0 ? (
+            <div className="py-12 text-center bg-slate-50 rounded-[32px] border border-dashed border-slate-200">
+              <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+              <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">All Requests Processed</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {PENDING_APPROVALS.slice(0, 4).map((app, i) => (
+                <div key={app.id} className="flex items-center gap-4 p-4 rounded-3xl bg-slate-50/50 border border-slate-50 hover:bg-white hover:border-slate-200 hover:shadow-xl transition-all group">
+                  <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shadow-sm text-amber-500">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{app.title}</p>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{app.type} · {app.date}</p>
+                  </div>
+                  <button onClick={() => navigate('/admin/approvals')} className="p-2 rounded-xl bg-slate-900 text-white opacity-0 group-hover:opacity-100 transition-all">
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <button onClick={() => navigate('/admin/approvals')} className="w-full text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 mt-6 py-4 rounded-2xl bg-slate-50/50 transition-all">View Administrative Queue</button>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="card p-8 shadow-xl border-slate-100 flex flex-col justify-center text-center">
+           <div className="w-20 h-20 rounded-[32px] bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto mb-6">
+              <Brain className="w-10 h-10 text-indigo-500" />
+           </div>
+           <h3 className="font-heading text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Neural Insight Report</h3>
+           <p className="text-slate-500 text-sm font-medium leading-relaxed mb-8 max-w-xs mx-auto">
+             AI detects a 12% increase in engagement for subjects using multimodal teaching materials.
+           </p>
+           <button onClick={() => navigate('/admin/ai-engagement')} className="mx-auto bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">
+             Audit Neural Insights
+           </button>
         </motion.div>
       </div>
     </PageWrapper>

@@ -64,14 +64,21 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
   }
 
   const exportCSV = () => {
-    const headers = 'Name,Roll No,Subject,Attendance %,Department'
-    const rows = sorted.map(s => `${s.name},${s.rollNo},${s.subject},${s.attendance},${s.department}`)
-    const csv = [headers, ...rows].join('\n')
+    const headers = ['Name', 'Roll No', 'Subject', 'Attendance %', 'Department', 'Risk Status']
+    const rows = sorted.map(s => [
+      s.name,
+      s.rollNo,
+      s.subject,
+      `${s.attendance}%`,
+      s.department,
+      s.attendance < 65 ? 'High Risk' : 'Warning'
+    ].map(v => `"${v}"`).join(','))
+    const csv = [headers.join(','), ...rows].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'at-risk-students.csv'
+    a.download = `at-risk-report-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
   }
 
@@ -149,28 +156,30 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
-                    <td>
+                    <td className="py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black shadow-sm"
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black shadow-sm flex-shrink-0"
                           style={{ background: `${color}15`, color: color, border: `1px solid ${color}30` }}
                         >
                           {student.name.charAt(0)}
                         </div>
-                        <span className="font-bold text-slate-800">{student.name}</span>
+                        <span className="font-bold text-slate-800 break-words max-w-[140px] line-clamp-2 leading-tight">{student.name}</span>
                       </div>
                     </td>
-                    <td className="text-slate-500 font-bold text-xs">{student.subject}</td>
-                    <td>
+                    <td className="py-4">
+                      <div className="text-slate-500 font-bold text-xs break-words max-w-[120px] line-clamp-2 leading-tight">{student.subject}</div>
+                    </td>
+                    <td className="py-4">
                       <span className="font-heading font-black text-lg" style={{ color }}>
                         {student.attendance}%
                       </span>
                     </td>
-                    <td className="text-slate-500 font-bold text-xs">{student.department}</td>
-                    <td className="text-slate-300 font-bold text-[10px] uppercase tracking-wider">{student.rollNo}</td>
-                    <td>
+                    <td className="py-4 text-slate-500 font-bold text-xs uppercase tracking-tight">{student.department}</td>
+                    <td className="py-4 text-slate-400 font-black text-[10px] uppercase tracking-widest">{student.rollNo}</td>
+                    <td className="py-4">
                       <span className={status === 'danger' ? 'badge-danger' : 'badge-warning'}>
-                        {status === 'danger' ? '🔴' : '🟡'} {status === 'danger' ? 'Danger' : 'Warning'}
+                        {status === 'danger' ? '🔴' : '🟡'} {status === 'danger' ? 'High Risk' : 'Warning'}
                       </span>
                     </td>
                   </motion.tr>

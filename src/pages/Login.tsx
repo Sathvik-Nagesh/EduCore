@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Lock, ArrowRight, Eye, EyeOff, GraduationCap, CheckCircle2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const DEMO_CREDENTIALS: Record<string, { role: string; name: string; dept: string }> = {
-  'student@educore.in': { role: 'student', name: 'Rahul Verma', dept: 'CSE · Year 3' },
-  'faculty@educore.in': { role: 'faculty', name: 'Dr. Priya Sharma', dept: 'Database Systems' },
-  'admin@educore.in':   { role: 'admin',   name: 'Admin Kumar',      dept: 'Main Campus' },
+const DEMO_CREDENTIALS: Record<string, { id: string; role: string; name: string; dept: string }> = {
+  'student@educore.in': { id: '777b5e2d-dc99-43ef-b387-052637738f61', role: 'student', name: 'Rahul Verma', dept: 'CSE · Year 3' },
+  'faculty@educore.in': { id: '888b5e2d-dc99-43ef-b387-052637738f62', role: 'faculty', name: 'Dr. Priya Sharma', dept: 'Database Systems' },
+  'admin@educore.in':   { id: '999b5e2d-dc99-43ef-b387-052637738f63', role: 'admin',   name: 'Admin Kumar',      dept: 'Main Campus' },
 }
 
 export default function Login() {
@@ -30,7 +30,7 @@ export default function Login() {
       setLoading(false)
       return
     }
-    localStorage.setItem('educore_user', JSON.stringify({ email, role: creds.role, name: creds.name }))
+    localStorage.setItem('educore_user', JSON.stringify({ id: creds.id, email, role: creds.role, name: creds.name }))
     toast.success(`Welcome back, ${creds.name.split(' ')[0]}!`)
     setLoading(false)
     navigate(`/${creds.role}`)

@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion'
 import PageWrapper from '../../components/layout/PageWrapper'
 import TrendChart from '../../components/charts/TrendChart'
-import EngagementBar from '../../components/charts/EngagementBar'
 import { TREND_DATA, DEPARTMENT_ATTENDANCE, getAIEngagementBySubject } from '../../lib/mockData'
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, CartesianGrid } from 'recharts'
-import { AlertCircle, TrendingDown, Clock, Search } from 'lucide-react'
+import { ResponsiveContainer, ComposedChart, Scatter, XAxis, YAxis, Tooltip, Cell, CartesianGrid, RadarChart, PolarGrid, PolarAngleAxis, Radar } from 'recharts'
+import { AlertCircle, TrendingDown, Clock, Search, Activity } from 'lucide-react'
 
 const ATTENDANCE_PATTERNS = [
   { id: 1, type: 'Time-based', pattern: 'Monday First Hour Avoidance', description: '42% drop in attendance for CSE-A Monday 9:00 AM slots over the last 4 weeks.', severity: 'High', action: 'Notify Faculty' },
@@ -82,43 +81,83 @@ export default function AnalyticsPage({ onLogout }: AnalyticsPageProps) {
           </div>
         </motion.div>
 
-        {/* Department Comparison */}
+        {/* Department Cohort Radar */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="card p-8 shadow-xl border-slate-100">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight">
-              Department Performance Matrix
-            </h2>
-            {/* Legend */}
-            <div className="flex gap-4 text-[9px] text-slate-400 font-black uppercase tracking-[0.2em]">
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> High</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /> Mid</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500" /> Risk</span>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center">
+              <Activity className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight">Cohort Pulse Radar</h2>
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Departmental performance vectors across 6 divisions</p>
             </div>
           </div>
-          
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={DEPARTMENT_ATTENDANCE} margin={{ left: -20, top: 20 }}>
-              <CartesianGrid horizontal={false} stroke="#F8FAFC" />
-              <XAxis dataKey="department" tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 900 }} tickLine={false} axisLine={false} />
-              <YAxis domain={[50, 100]} hide />
-              <Tooltip cursor={{ fill: '#F8FAFC' }} content={<CustomTooltip />} />
-              <Bar dataKey="attendance" radius={[20, 20, 20, 20]} barSize={32}>
-                {DEPARTMENT_ATTENDANCE.map((entry, i) => (
-                  <Cell
-                    key={i}
-                    fill={entry.attendance >= 75 ? '#10B981' : entry.attendance >= 65 ? '#F59E0B' : '#EF4444'}
-                    fillOpacity={0.9}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="grid grid-cols-2 gap-6 items-center">
+            <div className="w-full" style={{ height: '260px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart data={DEPARTMENT_ATTENDANCE.map(d => ({ ...d, target: 80 }))} cx="50%" cy="50%" outerRadius={90}>
+                  <PolarGrid stroke="#F1F5F9" />
+                  <PolarAngleAxis dataKey="department" tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 900 }} />
+                  <Radar name="Attendance" dataKey="attendance" stroke="#10B981" fill="#10B981" fillOpacity={0.12} strokeWidth={3} />
+                  <Radar name="Target" dataKey="target" stroke="#F59E0B" fill="none" strokeDasharray="5 3" strokeWidth={2} />
+                  <Tooltip contentStyle={{ background: 'white', border: '1px solid #F1F5F9', borderRadius: 12, fontSize: 11, fontWeight: 800 }} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="space-y-3">
+              {DEPARTMENT_ATTENDANCE.map((dept, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider w-10">{dept.department}</span>
+                  <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${dept.attendance}%`,
+                        background: dept.attendance >= 75 ? '#10B981' : dept.attendance >= 65 ? '#F59E0B' : '#EF4444'
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs font-black w-8 text-right" style={{ color: dept.attendance >= 75 ? '#10B981' : dept.attendance >= 65 ? '#F59E0B' : '#EF4444' }}>{dept.attendance}%</span>
+                </div>
+              ))}
+              <div className="flex gap-4 pt-2 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" />≥75%</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" />65-74%</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500" />&lt;65%</span>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
-        {/* AI Engagement */}
+        {/* AI Subject Interaction Scatter */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="card p-8 shadow-xl border-slate-100">
-          <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-6">Agent Engagement Index</h2>
-          <EngagementBar data={engagementData} height={240} />
+          <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Subject Intelligence Spectrum</h2>
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-8">AI query volume mapped against subject engagement depth</p>
+          <div className="space-y-4">
+            {engagementData.map((item, i) => {
+              const max = engagementData[0]?.count || 1
+              const pct = Math.round((item.count / max) * 100)
+              const colors = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444']
+              const col = colors[i % colors.length]
+              return (
+                <div key={i} className="flex items-center gap-4">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight w-28 truncate">{item.subject}</span>
+                  <div className="flex-1 relative h-8 bg-slate-50 rounded-xl overflow-hidden border border-slate-100">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ delay: 0.5 + i * 0.08, duration: 0.7, ease: 'easeOut' }}
+                      className="absolute inset-y-0 left-0 rounded-xl flex items-center justify-end pr-3"
+                      style={{ background: `${col}15`, borderRight: `3px solid ${col}` }}
+                    >
+                      <span className="text-[10px] font-black" style={{ color: col }}>{item.count}</span>
+                    </motion.div>
+                  </div>
+                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: col }} />
+                </div>
+              )
+            })}
+          </div>
           <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-6 text-right">
             Total verified interactions: {engagementData.reduce((s, d) => s + d.count, 0)}
           </p>

@@ -21,42 +21,67 @@ async function callGeminiFallback(
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY
   if (!apiKey) throw new Error('No Gemini API key')
 
-  const contents = [
-    { role: 'user', parts: [{ text: systemPrompt }] },
-    { role: 'model', parts: [{ text: 'Understood. I will act as an AI study assistant.' }] },
-    ...messages.map(m => ({
-      role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.content }],
-    })),
-  ]
+  // Use systemInstruction for the system prompt (Gemini 2.0+ supports this)
+  const contents = messages.map(m => ({
+    role: m.role === 'user' ? 'user' : 'model',
+    parts: [{ text: m.content }],
+  }))
+
+  const body = {
+    contents,
+    systemInstruction: {
+      role: 'user',
+      parts: [{ text: systemPrompt }]
+    },
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 1024,
+    }
+  }
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}&alt=sse`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents }),
+      body: JSON.stringify(body),
     }
   )
 
-  if (!res.ok) throw new Error(`Gemini error ${res.status}`)
+  if (!res.ok) {
+    const errText = await res.text()
+    console.error('[Gemini] Error response:', errText)
+    throw new Error(`Gemini error ${res.status}: ${errText}`)
+  }
 
   const reader = res.body!.getReader()
   const decoder = new TextDecoder()
+  let buffer = ''
+  let hasOutput = false
 
   while (true) {
     const { done, value } = await reader.read()
     if (done) break
-    const chunk = decoder.decode(value)
-    const lines = chunk.split('\n').filter(l => l.startsWith('data: '))
+    
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() || ''
+
     for (const line of lines) {
-      try {
-        const json = JSON.parse(line.slice(6))
-        const token = json?.candidates?.[0]?.content?.parts?.[0]?.text
-        if (token) onToken(token)
-      } catch { /* skip malformed */ }
+      const trimmed = line.trim()
+      if (trimmed.startsWith('data: ')) {
+        try {
+          const jsonStr = trimmed.slice(6)
+          if (jsonStr === '[DONE]') continue
+          const json = JSON.parse(jsonStr)
+          const token = json?.candidates?.[0]?.content?.parts?.[0]?.text
+          if (token) { onToken(token); hasOutput = true }
+        } catch { /* skip malformed chunks */ }
+      }
     }
   }
+
+  if (!hasOutput) throw new Error('Gemini returned empty response')
 }
 
 // ─── Mock Fallback ────────────────────────────────────────────────────────────
@@ -84,20 +109,20 @@ async function callWithFallback(
   systemPrompt: string,
   onToken: (t: string) => void
 ): Promise<{ provider: string }> {
-  // 1. NVIDIA (primary)
-  try {
-    await callAI(messages, systemPrompt, onToken)
-    return { provider: 'nvidia' }
-  } catch (e) {
-    console.warn('[AI] NVIDIA failed, trying Gemini…', e)
-  }
-
-  // 2. Gemini (secondary)
+  // 1. Gemini (Now primary as it has better CORS support)
   try {
     await callGeminiFallback(messages, systemPrompt, onToken)
     return { provider: 'gemini' }
   } catch (e) {
-    console.warn('[AI] Gemini failed, using mock…', e)
+    console.warn('[AI] Gemini failed, trying NVIDIA…', e)
+  }
+
+  // 2. NVIDIA (Secondary)
+  try {
+    await callAI(messages, systemPrompt, onToken)
+    return { provider: 'nvidia' }
+  } catch (e) {
+    console.warn('[AI] NVIDIA failed, using mock…', e)
   }
 
   // 3. Mock (final fallback)

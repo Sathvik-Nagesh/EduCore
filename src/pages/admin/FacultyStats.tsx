@@ -98,20 +98,22 @@ export default function FacultyStats({ onLogout }: FacultyStatsProps) {
         className="card p-8 border-slate-100 shadow-xl"
       >
         <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-8">Classes Distribution Index</h2>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={chartData} margin={{ left: -20, right: 10, top: 10 }}>
-            <CartesianGrid vertical={false} stroke="#F1F5F9" strokeDasharray="3 3" />
-            <XAxis dataKey="name" tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 900 }} tickLine={false} axisLine={false} />
-            <YAxis hide />
-            <Tooltip
-              cursor={{ fill: '#F8FAFC' }}
-              content={<CustomTooltip unit=" units" />}
-            />
-            <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, textTransform: 'uppercase', fontSize: 10, fontWeight: 900, color: '#94A3B8' }} />
-            <Bar dataKey="scheduled" fill="#F1F5F9" radius={[20, 20, 20, 20]} name="Scheduled" barSize={24} />
-            <Bar dataKey="taken" fill="#2563EB" radius={[20, 20, 20, 20]} name="Taken Markings" barSize={24} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="w-full" style={{ height: '260px', minHeight: '260px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ left: -20, right: 10, top: 10 }}>
+              <CartesianGrid vertical={false} stroke="#F1F5F9" strokeDasharray="3 3" />
+              <XAxis dataKey="name" tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 900 }} tickLine={false} axisLine={false} />
+              <YAxis hide />
+              <Tooltip
+                cursor={{ fill: '#F8FAFC' }}
+                content={<CustomTooltip unit=" units" />}
+              />
+              <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, textTransform: 'uppercase', fontSize: 10, fontWeight: 900, color: '#94A3B8' }} />
+              <Bar dataKey="scheduled" fill="#F1F5F9" radius={[12, 12, 12, 12]} name="Scheduled" barSize={24} />
+              <Bar dataKey="taken" fill="#2563EB" radius={[12, 12, 12, 12]} name="Taken Markings" barSize={24} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </motion.div>
     </PageWrapper>
   )

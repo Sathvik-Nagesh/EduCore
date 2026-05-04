@@ -45,10 +45,10 @@ export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
   }
 
   return (
-    <div className="overflow-x-auto pb-1 scrollbar-hide">
-      <div className="inline-block p-2">
+    <div className="overflow-x-auto pb-4 scrollbar-hide">
+      <div className="inline-block p-4 min-w-full">
         {/* Month Labels */}
-        <div className="flex gap-[16px] mb-6 pl-14">
+        <div className="flex mb-4 pl-16 relative h-6">
           {weeks.map((week, i) => {
             const date = week.find(d => d.date !== '')?.date
             const currentMonth = date ? format(parseISO(date), 'MMM') : ''
@@ -57,18 +57,20 @@ export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
             
             const shouldShow = i === 0 || (currentMonth !== prevMonth && currentMonth !== '')
             
+            if (!shouldShow) return <div key={i} className="w-12" />
+            
             return (
-              <div key={i} className="w-10 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-                {shouldShow ? currentMonth : ''}
+              <div key={i} className="absolute text-[10px] font-black text-slate-400 uppercase tracking-widest" style={{ left: `${i * 3.25}rem` }}>
+                {currentMonth}
               </div>
             )
           })}
         </div>
 
-        <div className="flex flex-col gap-[16px]">
+        <div className="flex flex-col gap-2">
           {DAY_LABELS.map((day, dayIndex) => (
-            <div key={day} className="flex gap-[16px] items-center">
-              <div className="w-14 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right pr-6">
+            <div key={day} className="flex gap-2 items-center">
+              <div className="w-14 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right pr-4">
                 {dayIndex % 2 === 1 ? day : ''}
               </div>
               {weeks.map((week, weekIndex) => {
@@ -84,7 +86,7 @@ export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
                       delay: (weekIndex * 0.005) + (dayIndex * 0.002),
                       duration: 0.2
                     }}
-                    className="w-10 h-10 rounded-2xl shadow-sm relative group cursor-help transition-all hover:scale-125 active:scale-90 z-10 border border-slate-100/10"
+                    className="w-11 h-11 rounded-xl shadow-sm relative group cursor-help transition-all hover:scale-125 active:scale-90 z-10 border border-slate-100/10"
                     style={{ backgroundColor: color }}
                   >
                     {cell && cell.percentage !== -1 && (

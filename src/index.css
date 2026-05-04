@@ -394,14 +394,15 @@ h1, h2, h3, h4, h5, h6 {
    ============================================ */
 
 .chat-bubble-user {
-  background: var(--text-primary);
+  background: linear-gradient(135deg, #0F172A, #1E293B);
   color: white;
   border-radius: 1.5rem 1.5rem 0.25rem 1.5rem;
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   max-width: 75%;
   align-self: flex-end;
-  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
   animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .chat-bubble-ai {
@@ -409,10 +410,10 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--border);
   color: var(--text-primary);
   border-radius: 1.5rem 1.5rem 1.5rem 0.25rem;
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   max-width: 85%;
   align-self: flex-start;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

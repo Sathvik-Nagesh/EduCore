@@ -92,7 +92,8 @@ export default function FacultyDashboard({ onLogout }: Props) {
           transition={{ delay: 0.1 }} className="card p-8 lg:col-span-2 border-slate-100 shadow-xl">
           <h3 className="font-heading text-lg font-black text-slate-900 mb-1 uppercase tracking-tight">Subject Engagement Index</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">DBMS vs OS Performance Vectors</p>
-          <ResponsiveContainer width="100%" height={220}>
+          <div className="w-full" style={{ height: '240px', minHeight: '240px' }}>
+            <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={RADAR_DATA} cx="50%" cy="50%" outerRadius={80}>
               <PolarGrid stroke="#F1F5F9" />
               <PolarAngleAxis dataKey="metric"
@@ -102,6 +103,7 @@ export default function FacultyDashboard({ onLogout }: Props) {
               <Tooltip content={<CustomTooltip unit="" />} />
             </RadarChart>
           </ResponsiveContainer>
+          </div>
           <div className="flex gap-4 justify-center mt-1">
             <div className="flex items-center gap-1.5 text-xs text-navy-400 font-bold"><div className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />DBMS</div>
             <div className="flex items-center gap-1.5 text-xs text-navy-400 font-bold"><div className="w-2.5 h-2.5 rounded-sm bg-blue-500" />OS</div>
@@ -113,7 +115,8 @@ export default function FacultyDashboard({ onLogout }: Props) {
           transition={{ delay: 0.15 }} className="card p-8 lg:col-span-3 border-slate-100 shadow-xl">
           <h3 className="font-heading text-lg font-black text-slate-900 mb-1 uppercase tracking-tight">Active Section Distribution</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Verified Attendance Percentages by cohort</p>
-          <ResponsiveContainer width="100%" height={200}>
+          <div className="w-full" style={{ height: '220px', minHeight: '220px' }}>
+            <ResponsiveContainer width="100%" height="100%">
             <BarChart data={sectionData} layout="vertical" margin={{ left: 0, right: 16, top: 4, bottom: 0 }}>
               <CartesianGrid horizontal={false} stroke="#F8FAFC" />
               <XAxis type="number" domain={[0, 100]} hide />
@@ -126,6 +129,7 @@ export default function FacultyDashboard({ onLogout }: Props) {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+          </div>
           {/* 75% marker */}
           <div className="flex items-center gap-2 mt-2 text-xs text-amber-600 font-bold">
             <div className="w-3 h-0.5 border-t border-dashed border-amber-600" />

@@ -21,24 +21,26 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function EngagementBar({ data, height = 200 }: EngagementBarProps) {
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-        <XAxis
-          dataKey="subject"
-          tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 900 }}
-          tickLine={false}
-          axisLine={false}
-        />
-        <YAxis
-          hide
-        />
-        <Tooltip cursor={{ fill: '#F8FAFC' }} content={<CustomTooltip />} />
-        <Bar dataKey="count" radius={[16, 16, 16, 16]} barSize={32}>
-          {data.map((_, index) => (
-            <Cell key={index} fill={COLORS[index % COLORS.length]} fillOpacity={0.9} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <div style={{ width: '100%', height: height, minHeight: height }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <XAxis
+            dataKey="subject"
+            tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 900 }}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            hide
+          />
+          <Tooltip cursor={{ fill: '#F8FAFC' }} content={<CustomTooltip />} />
+          <Bar dataKey="count" radius={[16, 16, 16, 16]} barSize={32}>
+            {data.map((_, index) => (
+              <Cell key={index} fill={COLORS[index % COLORS.length]} fillOpacity={0.9} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   )
 }

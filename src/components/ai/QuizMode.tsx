@@ -149,22 +149,22 @@ export default function QuizMode({ subjectName, onClose }: QuizModeProps) {
         {phase === 'intro' && (
           <motion.div key="intro" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             className="flex flex-col items-center justify-center h-full text-center gap-6 py-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-electric-blue/20 border border-amber-500/20 flex items-center justify-center">
-              <Trophy className="w-8 h-8 text-amber-400" />
+            <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center">
+              <Trophy className="w-8 h-8 text-amber-500" />
             </div>
             <div>
-              <h3 className="font-heading text-xl font-bold text-white mb-2">Quiz: {subjectName}</h3>
-              <p className="text-white/40 text-sm max-w-xs leading-relaxed">
+              <h3 className="font-heading text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">Quiz: {subjectName}</h3>
+              <p className="text-slate-400 text-sm max-w-xs leading-relaxed font-medium">
                 5 AI-generated multiple choice questions based on your course material. Choose wisely!
               </p>
             </div>
             <div className="flex gap-3">
               <button onClick={startQuiz}
-                className="btn-primary flex items-center gap-2 px-6 py-2.5 text-sm">
+                className="w-full bg-slate-900 text-white px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2">
                 <Trophy className="w-4 h-4" /> Start Quiz
               </button>
               <button onClick={onClose}
-                className="btn-ghost px-4 py-2.5 text-sm">Cancel</button>
+                className="px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[11px] text-slate-400 hover:text-slate-900 transition-all">Cancel</button>
             </div>
           </motion.div>
         )}
@@ -173,8 +173,8 @@ export default function QuizMode({ subjectName, onClose }: QuizModeProps) {
         {phase === 'loading' && (
           <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="flex flex-col items-center justify-center h-full gap-4">
-            <Loader2 className="w-8 h-8 text-electric-blue animate-spin" />
-            <p className="text-white/40 text-sm">Generating quiz questions…</p>
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Generating quiz questions…</p>
           </motion.div>
         )}
 
@@ -184,16 +184,16 @@ export default function QuizMode({ subjectName, onClose }: QuizModeProps) {
             className="flex flex-col h-full px-2 py-4 gap-4">
             {/* Progress */}
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-1.5 rounded-full bg-white/8">
-                <div className="h-full rounded-full bg-electric-blue transition-all duration-500"
+              <div className="flex-1 h-1.5 rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-blue-600 transition-all duration-500"
                   style={{ width: `${((current) / questions.length) * 100}%` }} />
               </div>
-              <span className="text-xs text-white/30 flex-shrink-0">{current + 1}/{questions.length}</span>
+              <span className="text-[10px] font-black text-slate-300 flex-shrink-0 uppercase tracking-widest">{current + 1}/{questions.length}</span>
             </div>
 
             {/* Question */}
-            <div className="card p-4 border-white/10">
-              <p className="text-white font-semibold text-sm leading-relaxed">{q.question}</p>
+            <div className="card p-5 border-slate-100 bg-slate-50/50 shadow-sm">
+              <p className="text-slate-900 font-black text-sm leading-relaxed tracking-tight">{q.question}</p>
             </div>
 
             {/* Options */}
@@ -202,24 +202,24 @@ export default function QuizMode({ subjectName, onClose }: QuizModeProps) {
                 const isSelected = selected === i
                 const isCorrect = i === q.answer
                 const showResult = selected !== null
-                let style = 'border-white/10 bg-white/[0.03] text-white/70 hover:border-white/25'
+                let style = 'border-slate-100 bg-white text-slate-900 hover:border-slate-300 shadow-sm'
                 if (showResult) {
-                  if (isCorrect) style = 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300'
-                  else if (isSelected) style = 'border-red-500/40 bg-red-500/10 text-red-300'
-                  else style = 'border-white/5 bg-white/[0.01] text-white/30'
+                  if (isCorrect) style = 'border-emerald-500 bg-emerald-50 text-emerald-900 font-bold shadow-emerald-100/50'
+                  else if (isSelected) style = 'border-red-500 bg-red-50 text-red-900 font-bold'
+                  else style = 'border-slate-50 bg-slate-50/30 text-slate-400 grayscale opacity-50'
                 } else if (isSelected) {
-                  style = 'border-electric-blue/50 bg-electric-blue/10 text-white'
+                  style = 'border-indigo-600 bg-indigo-50 text-indigo-900 font-black shadow-lg shadow-indigo-100'
                 }
 
                 return (
                   <button key={i} onClick={() => handleSelect(i)}
-                    className={`w-full p-3 rounded-xl border text-left text-sm flex items-center gap-3 transition-all ${style}`}>
-                    <span className="w-6 h-6 rounded-lg border border-current/30 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    className={`w-full p-4 rounded-2xl border text-left text-sm flex items-center gap-3 transition-all ${style}`}>
+                    <span className="w-8 h-8 rounded-xl border border-current/20 flex items-center justify-center text-[10px] font-black flex-shrink-0">
                       {String.fromCharCode(65 + i)}
                     </span>
-                    <span className="flex-1">{opt}</span>
-                    {showResult && isCorrect && <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />}
-                    {showResult && isSelected && !isCorrect && <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />}
+                    <span className="flex-1 font-black uppercase tracking-tight text-[13px]">{opt}</span>
+                    {showResult && isCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />}
+                    {showResult && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />}
                   </button>
                 )
               })}
@@ -229,15 +229,16 @@ export default function QuizMode({ subjectName, onClose }: QuizModeProps) {
             <AnimatePresence>
               {showExplanation && q.explanation && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                  className="px-4 py-3 rounded-xl bg-electric-blue/8 border border-electric-blue/15 text-xs text-white/60 leading-relaxed">
-                  <strong className="text-electric-blue">Explanation: </strong>{q.explanation}
+                  className="px-5 py-4 rounded-2xl bg-blue-50/50 border border-blue-100 text-[11px] text-slate-600 leading-relaxed font-medium">
+                  <strong className="text-blue-600 font-black uppercase tracking-widest text-[9px] block mb-1">Explanation</strong>
+                  {q.explanation}
                 </motion.div>
               )}
             </AnimatePresence>
 
             <button onClick={handleNext} disabled={selected === null}
-              className="btn-primary flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-30">
-              {current + 1 >= questions.length ? 'See Results' : 'Next'} <ChevronRight className="w-4 h-4" />
+              className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl disabled:opacity-20 transition-all flex items-center justify-center gap-2">
+              {current + 1 >= questions.length ? 'See Results' : 'Next Question'} <ChevronRight className="w-4 h-4" />
             </button>
           </motion.div>
         )}
@@ -245,32 +246,32 @@ export default function QuizMode({ subjectName, onClose }: QuizModeProps) {
         {/* Results */}
         {phase === 'results' && (
           <motion.div key="results" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center h-full text-center gap-5 py-8">
-            <div className={`w-20 h-20 rounded-3xl flex items-center justify-center text-3xl font-black
-              ${score >= 4 ? 'bg-emerald-500/20 border border-emerald-500/30' : score >= 2 ? 'bg-amber-500/20 border border-amber-500/30' : 'bg-red-500/20 border border-red-500/30'}`}>
+            className="flex flex-col items-center justify-center h-full text-center gap-6 py-8">
+            <div className={`w-24 h-24 rounded-[32px] flex items-center justify-center text-4xl shadow-xl
+              ${score >= 4 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : score >= 2 ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
               {score >= 4 ? '🏆' : score >= 2 ? '📚' : '💪'}
             </div>
             <div>
-              <p className="text-5xl font-black font-heading text-white mb-1">{score}<span className="text-white/30 text-2xl">/{questions.length}</span></p>
-              <p className={`text-sm font-semibold ${score >= 4 ? 'text-emerald-400' : score >= 2 ? 'text-amber-400' : 'text-red-400'}`}>
-                {score >= 4 ? 'Excellent! 🎉' : score >= 2 ? 'Good effort! Keep practicing.' : 'Review this topic again.'}
+              <p className="text-6xl font-black font-heading text-slate-900 mb-1 tracking-tight">{score}<span className="text-slate-200 text-3xl">/{questions.length}</span></p>
+              <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${score >= 4 ? 'text-emerald-600' : score >= 2 ? 'text-amber-600' : 'text-red-600'}`}>
+                {score >= 4 ? 'Mastery Achieved! 🎉' : score >= 2 ? 'Solid Effort! Keep practicing.' : 'Needs Review & Study.'}
               </p>
             </div>
             {/* Per-question summary */}
-            <div className="flex gap-2">
+            <div className="flex gap-2.5">
               {answers.map((a, i) => (
-                <div key={i} className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold
-                  ${a === questions[i]?.answer ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                <div key={i} className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black shadow-sm border
+                  ${a === questions[i]?.answer ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}`}>
                   {i + 1}
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-4 mt-4">
               <button onClick={startQuiz}
-                className="btn-ghost flex items-center gap-2 px-4 py-2 text-sm">
+                className="px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-400 hover:text-slate-900 transition-all flex items-center gap-2">
                 <RotateCcw className="w-4 h-4" /> Retry
               </button>
-              <button onClick={onClose} className="btn-primary px-6 py-2 text-sm">Back to Chat</button>
+              <button onClick={onClose} className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl hover:-translate-y-0.5 transition-all">Back to Chat</button>
             </div>
           </motion.div>
         )}

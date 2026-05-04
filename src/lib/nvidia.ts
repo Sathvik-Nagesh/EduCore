@@ -3,7 +3,10 @@ export type { ChatMessage } from './types'
 
 const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY
 const MODEL = import.meta.env.VITE_NVIDIA_MODEL || 'mistralai/mistral-medium-3.5-128b'
-const INVOKE_URL = 'https://integrate.api.nvidia.com/v1/chat/completions'
+// Use Vite proxy in dev to avoid CORS; direct URL in production
+const INVOKE_URL = import.meta.env.DEV
+  ? '/api/nvidia/v1/chat/completions'
+  : 'https://integrate.api.nvidia.com/v1/chat/completions'
 
 /**
  * Call NVIDIA's Mistral API. Supports streaming (SSE) in the browser via fetch.
