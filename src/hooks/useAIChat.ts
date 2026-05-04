@@ -39,14 +39,31 @@ async function callGeminiFallback(
     }
   }
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+  let res: Response | null = null;
+  let attempt = 0;
+  const MAX_RETRIES = 3;
+
+  while (attempt <= MAX_RETRIES) {
+    res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }
+    )
+
+    if (res.status === 429 && attempt < MAX_RETRIES) {
+      const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+      console.warn(`[Gemini] Rate limited (429). Retrying in ${Math.round(delay)}ms...`);
+      await new Promise(r => setTimeout(r, delay));
+      attempt++;
+      continue;
     }
-  )
+    break;
+  }
+
+  if (!res) throw new Error('Failed to execute fetch');
 
   if (!res.ok) {
     const errText = await res.text()
@@ -149,7 +166,7 @@ export function useAIChat() {
   const topicTracker = useRef<TopicTracker>({})
 
   const sendMessage = useCallback(async (content: string, subject: string, subjectId: string) => {
-    if (!content.trim()) return
+    if (!content.trim() || isLoading) return
 
     const userMessage: ChatMessage = { role: 'user', content }
     setMessages(prev => [...prev, userMessage])
@@ -194,7 +211,7 @@ export function useAIChat() {
     setMessages(prev => [...prev, { role: 'assistant', content: fullResponse }])
     setStreamingText('')
     setIsLoading(false)
-  }, [messages])
+  }, [messages, isLoading])
 
   const clearChat = useCallback(() => {
     setMessages([])

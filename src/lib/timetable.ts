@@ -39,6 +39,30 @@ function minutesToTime(minutes: number): string {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
 }
 
+export function generateTimeSlots(startTime: string, endTime: string, classDuration: number) {
+  const startMin = timeToMinutes(startTime)
+  const endMin = timeToMinutes(endTime)
+  const slots: { start: string; end: string }[] = []
+  let classesSinceBreak = 0
+  let t = startMin
+  
+  while (t + classDuration <= endMin) {
+    const slotStart = minutesToTime(t)
+    const slotEnd = minutesToTime(t + classDuration)
+    slots.push({ start: slotStart, end: slotEnd })
+    
+    t += classDuration
+    classesSinceBreak += 1
+    
+    // Add 30 min break after every 2 classes
+    if (classesSinceBreak >= 2 && t + 30 <= endMin) {
+      t += 30 // Skip 30 mins for break
+      classesSinceBreak = 0
+    }
+  }
+  return slots
+}
+
 export function generateTimetable(
   faculties: FacultyConstraint[],
   startTime = '09:00',
@@ -68,23 +92,8 @@ export function generateTimetable(
   const daySlotsMap: Record<string, string[]> = {}
   for (const day of workingDays) {
     const dayEnd = dayEndTimes[day] || endTime
-    const startMin = timeToMinutes(startTime)
-    const endMin = timeToMinutes(dayEnd)
-    const slots: string[] = []
-    let elapsedSinceBreak = 0
-    let t = startMin
-    while (t + classDuration <= endMin) {
-      slots.push(minutesToTime(t))
-      t += classDuration
-      elapsedSinceBreak += classDuration
-      
-      // If we've hit 120 mins (2 hours), add a 30 min break
-      if (elapsedSinceBreak >= 120 && t + 30 <= endMin) {
-        t += 30 // Skip 30 mins for break
-        elapsedSinceBreak = 0
-      }
-    }
-    daySlotsMap[day] = slots
+    const slots = generateTimeSlots(startTime, dayEnd, classDuration)
+    daySlotsMap[day] = slots.map(s => s.start)
   }
 
   // Build a list of all subject-faculty assignments to schedule

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Trash2, Zap, Download, AlertCircle, Calendar, CalendarDays, Sun, MapPin, Settings2, Users } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
-import { generateTimetable, detectConflicts } from '../../lib/timetable'
+import { generateTimetable, detectConflicts, generateTimeSlots } from '../../lib/timetable'
 import type { FacultyConstraint, TimetableGrid } from '../../lib/timetable'
 import toast from 'react-hot-toast'
 
@@ -109,22 +109,7 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
     toast.success('Timetable exported!')
   }
 
-  const timeSlots = (() => {
-    const slots = []
-    const startMin = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1])
-    const endMin = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1])
-    for (let t = startMin; t + duration <= endMin; t += duration) {
-      const h = Math.floor(t / 60)
-      const m = t % 60
-      const endH = Math.floor((t + duration) / 60)
-      const endM = (t + duration) % 60
-      slots.push({
-        start: `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`,
-        end: `${endH.toString().padStart(2, '0')}:${endM.toString().padStart(2, '0')}`
-      })
-    }
-    return slots
-  })()
+  const timeSlots = generateTimeSlots(startTime, endTime, duration)
 
   return (
     <PageWrapper role="admin" userName={user.name || 'Admin'} onLogout={onLogout}
@@ -297,12 +282,12 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
                   <table className="w-full border-collapse">
                     <thead>
                       <tr>
-                        <th className="p-8 text-left bg-slate-50/30 border-b border-slate-100 w-40 sticky left-0 z-20 backdrop-blur-md">
-                          <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Matrix \ Timeline</span>
+                        <th className="p-4 md:p-6 text-left bg-slate-50/30 border-b border-slate-100 w-32 sticky left-0 z-20 backdrop-blur-md">
+                          <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] whitespace-nowrap">Matrix \ Timeline</span>
                         </th>
                         {timeSlots.map(slot => (
-                          <th key={slot.start} className="p-4 border-b border-slate-50 text-center bg-white min-w-[160px]">
-                            <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.15em] bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">{slot.start} — {slot.end}</span>
+                          <th key={slot.start} className="p-3 border-b border-slate-50 text-center bg-white min-w-[140px]">
+                            <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.15em] bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 whitespace-nowrap">{slot.start} — {slot.end}</span>
                           </th>
                         ))}
                       </tr>
@@ -312,10 +297,10 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
                         const isHalf = halfDays.includes(day)
                         return (
                           <tr key={day} className="group border-b border-slate-50 last:border-0">
-                            <td className="p-8 bg-white sticky left-0 z-10 border-r border-slate-50 shadow-[4px_0_12px_rgba(0,0,0,0.02)]">
-                              <div className="flex items-center gap-3">
-                                <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">{day}</span>
-                                {isHalf && <Sun className="w-4 h-4 text-amber-500 fill-amber-500/20" />}
+                            <td className="p-4 md:p-6 bg-white sticky left-0 z-10 border-r border-slate-50 shadow-[4px_0_12px_rgba(0,0,0,0.02)]">
+                              <div className="flex items-center gap-2">
+                                <span className="font-black text-slate-900 text-xs md:text-sm uppercase tracking-tighter">{day}</span>
+                                {isHalf && <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />}
                               </div>
                             </td>
                             {timeSlots.map((slot, sIdx) => {
@@ -335,22 +320,22 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
                                   )}
                                   
                                   {isAfterHalfDay ? (
-                                    <div className="h-28 flex items-center justify-center border border-slate-100/50 rounded-[2.5rem] bg-slate-50/50 grayscale opacity-40">
+                                    <div className="h-24 flex items-center justify-center border border-slate-100/50 rounded-3xl bg-slate-50/50 grayscale opacity-40">
                                       <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300">Off-Duty</span>
                                     </div>
                                   ) : classSlot ? (
                                     <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                                      className="h-28 p-5 rounded-[2.5rem] border transition-all hover:scale-[1.02] hover:shadow-2xl relative overflow-hidden group/item cursor-pointer shadow-sm"
+                                      className="h-24 p-4 rounded-3xl border transition-all hover:scale-[1.02] hover:shadow-2xl relative overflow-hidden group/item cursor-pointer shadow-sm"
                                       style={{ background: `${classSlot.color}05`, borderColor: `${classSlot.color}20` }}>
                                       <div className="relative z-10 flex flex-col h-full justify-between">
                                         <div>
-                                          <div className="font-black text-slate-900 text-xs uppercase tracking-tight leading-tight mb-1">{classSlot.subject}</div>
+                                          <div className="font-black text-slate-900 text-xs uppercase tracking-tight leading-tight mb-0.5">{classSlot.subject}</div>
                                           <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{classSlot.faculty}</div>
                                         </div>
                                         <div className="flex items-center justify-between mt-auto pt-2">
-                                          <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-md px-3 py-1 rounded-xl border border-slate-100 shadow-sm">
-                                            <MapPin className="w-2.5 h-2.5 text-slate-400" />
-                                            <span className="text-[9px] font-black text-slate-600">RM {classSlot.room}</span>
+                                          <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-100 shadow-sm">
+                                            <MapPin className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+                                            <span className="text-[9px] font-black text-slate-600 whitespace-nowrap overflow-hidden text-ellipsis">RM {classSlot.room}</span>
                                           </div>
                                           <div className="w-2 h-2 rounded-full" style={{ background: classSlot.color }} />
                                         </div>
@@ -358,7 +343,7 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
                                       <div className="absolute -bottom-6 -right-6 w-16 h-16 opacity-10 transition-transform group-hover/item:scale-150 rounded-full" style={{ background: classSlot.color }} />
                                     </motion.div>
                                   ) : (
-                                    <div className="h-28 border-2 border-dashed border-slate-100 rounded-[2.5rem] flex items-center justify-center group-hover:border-slate-200 transition-all bg-slate-50/10">
+                                    <div className="h-24 border-2 border-dashed border-slate-100 rounded-3xl flex items-center justify-center group-hover:border-slate-200 transition-all bg-slate-50/10">
                                       <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-400">Reserved</span>
                                     </div>
                                   )}

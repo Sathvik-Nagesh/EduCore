@@ -98,7 +98,7 @@ export default function FacultyStats({ onLogout }: FacultyStatsProps) {
         className="card p-8 border-slate-100 shadow-xl"
       >
         <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-8">Classes Distribution Index</h2>
-        <div className="w-full" style={{ height: '260px', minHeight: '260px' }}>
+        <div className="w-full relative" style={{ height: '260px', minHeight: '0' }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ left: -20, right: 10, top: 10 }}>
               <CartesianGrid vertical={false} stroke="#F1F5F9" strokeDasharray="3 3" />

@@ -226,7 +226,7 @@ export default function AdminDashboard({ onLogout }: Props) {
           transition={{ delay: 0.1 }} className="card p-8 lg:col-span-2 shadow-xl border-slate-100">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Behavioral Risk Matrix</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Attendance below 75% threshold</p>
-          <div className="w-full" style={{ height: '240px', minHeight: '240px' }}>
+          <div className="w-full relative" style={{ height: '240px', minHeight: '0' }}>
             <ResponsiveContainer width="100%" height="100%">
             <Treemap
               data={realAtRisk.length > 0 ? realAtRisk : AT_RISK.map(s => ({ ...s, size: 75 - s.pct }))}
@@ -253,7 +253,7 @@ export default function AdminDashboard({ onLogout }: Props) {
           transition={{ delay: 0.15 }} className="card p-8 lg:col-span-3 shadow-xl border-slate-100">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Campus Activity Synthesis</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Live utilization: Active users vs AI synthesized queries</p>
-          <div className="w-full" style={{ height: '240px', minHeight: '240px' }}>
+          <div className="w-full relative" style={{ height: '240px', minHeight: '0' }}>
             <ResponsiveContainer width="100%" height="100%">
             <LineChart data={realActivity.length > 0 ? realActivity : ACTIVITY} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
@@ -273,40 +273,13 @@ export default function AdminDashboard({ onLogout }: Props) {
         </motion.div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-5 mb-5">
-        {/* Pending Approvals */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }} className="card p-8 shadow-xl border-slate-100 lg:col-span-1">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight">Pending Verifications</h3>
-            <span className="bg-amber-100 text-amber-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">{PENDING_APPROVALS.length} New</span>
-          </div>
-          <div className="space-y-4">
-            {PENDING_APPROVALS.map((req) => (
-              <div key={req.id} className="p-4 rounded-2xl border border-slate-100 bg-slate-50/30 hover:bg-white hover:shadow-lg transition-all group">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{req.type}</span>
-                  <span className="text-[9px] font-bold text-slate-400">{req.date}</span>
-                </div>
-                <h4 className="font-black text-slate-900 text-sm mb-1">{req.title}</h4>
-                <div className="flex items-center justify-between mt-3">
-                  <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                    {req.status}
-                  </span>
-                  <button className="text-[10px] font-black uppercase tracking-widest text-slate-900 bg-white border border-slate-200 px-3 py-1.5 rounded-xl group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all shadow-sm">Review</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
+      <div className="grid lg:grid-cols-1 gap-5 mb-5">
         {/* AI Correlation Scatter */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }} className="card p-8 shadow-xl border-slate-100 lg:col-span-2">
+          transition={{ delay: 0.25 }} className="card p-8 shadow-xl border-slate-100">
           <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Intelligence Correlation</h3>
           <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Cross-metric analysis: AI Engagement vs Student Attendance</p>
-          <div className="w-full" style={{ height: '260px', minHeight: '260px' }}>
+          <div className="w-full relative" style={{ height: '260px', minHeight: '0' }}>
             <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
@@ -354,14 +327,14 @@ export default function AdminDashboard({ onLogout }: Props) {
                     <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{app.title}</p>
                     <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">{app.type} · {app.date}</p>
                   </div>
-                  <button onClick={() => navigate('/admin/approvals')} className="p-2 rounded-xl bg-slate-900 text-white opacity-0 group-hover:opacity-100 transition-all">
+                  <button onClick={() => navigate('/admin/leaves')} className="p-2 rounded-xl bg-slate-900 text-white opacity-0 group-hover:opacity-100 transition-all">
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               ))}
             </div>
           )}
-          <button onClick={() => navigate('/admin/approvals')} className="w-full text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 mt-6 py-4 rounded-2xl bg-slate-50/50 transition-all">View Administrative Queue</button>
+          <button onClick={() => navigate('/admin/leaves')} className="w-full text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 mt-6 py-4 rounded-2xl bg-slate-50/50 transition-all">View Administrative Queue</button>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="card p-8 shadow-xl border-slate-100 flex flex-col justify-center text-center">
@@ -372,7 +345,7 @@ export default function AdminDashboard({ onLogout }: Props) {
            <p className="text-slate-500 text-sm font-medium leading-relaxed mb-8 max-w-xs mx-auto">
              AI detects a 12% increase in engagement for subjects using multimodal teaching materials.
            </p>
-           <button onClick={() => navigate('/admin/ai-engagement')} className="mx-auto bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">
+           <button onClick={() => navigate('/admin/ai')} className="mx-auto bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">
              Audit Neural Insights
            </button>
         </motion.div>

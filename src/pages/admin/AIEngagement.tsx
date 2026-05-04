@@ -113,7 +113,7 @@ export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
               })
               const chartData = Object.entries(days).map(([day, count]) => ({ day, count }))
               return (
-                <div style={{ height: '220px' }}>
+                <div className="relative" style={{ height: '220px', minHeight: '0' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
                       <defs>

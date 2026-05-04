@@ -24,6 +24,7 @@ export default function StudentDashboard({ onLogout }: Props) {
 
   const [dbSummary, setDbSummary] = useState<any[]>([])
   const [ringHover, setRingHover] = useState<string | null>(null)
+  const [selectedAssignment, setSelectedAssignment] = useState<any | null>(null)
 
   useEffect(() => {
     const userId = user.supabase_id || '00000000-0000-0000-0000-000000000010'
@@ -299,7 +300,7 @@ export default function StudentDashboard({ onLogout }: Props) {
                 }`}>
                   {task.status}
                 </span>
-                <button className="text-[11px] font-black text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-widest bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm opacity-0 group-hover:opacity-100">View</button>
+                <button onClick={() => setSelectedAssignment(task)} className="text-[11px] font-black text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-widest bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm opacity-0 group-hover:opacity-100">View</button>
               </div>
             </div>
           ))}
@@ -330,6 +331,55 @@ export default function StudentDashboard({ onLogout }: Props) {
           ))}
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {selectedAssignment && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setSelectedAssignment(null)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
+              <div className="p-6 md:p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <span className="text-[10px] font-black text-blue-600 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 uppercase tracking-widest">{selectedAssignment.subject}</span>
+                    <h2 className="text-xl font-black text-slate-900 mt-3">{selectedAssignment.title}</h2>
+                  </div>
+                  <button onClick={() => setSelectedAssignment(null)} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors">
+                    <span className="text-slate-500 font-bold text-sm">✕</span>
+                  </button>
+                </div>
+                
+                <div className="space-y-4 mb-8 text-sm text-slate-600 font-medium">
+                  <p>Please review the attached reading materials and complete the associated questions. Ensure your submission is formatted correctly as per the syllabus guidelines.</p>
+                  
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <BookOpen className="w-5 h-5 text-blue-500" />
+                      <div>
+                        <p className="font-bold text-slate-900 text-xs uppercase tracking-widest">Reference_Material.pdf</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">2.4 MB · PDF Document</p>
+                      </div>
+                    </div>
+                    <button className="text-[10px] font-black uppercase tracking-widest text-slate-900 bg-white border border-slate-200 px-3 py-1.5 rounded-xl hover:bg-slate-900 hover:text-white transition-all shadow-sm">Download</button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-slate-400" />
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Due {new Date(selectedAssignment.dueDate).toLocaleDateString()}</span>
+                  </div>
+                  <button className="bg-slate-900 text-white px-6 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-800 transition-all shadow-md">
+                    Submit Work
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </PageWrapper>
   )
 }

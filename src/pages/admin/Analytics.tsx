@@ -93,7 +93,7 @@ export default function AnalyticsPage({ onLogout }: AnalyticsPageProps) {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-6 items-center">
-            <div className="w-full" style={{ height: '260px' }}>
+            <div className="w-full relative" style={{ height: '260px', minHeight: '0' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={DEPARTMENT_ATTENDANCE.map(d => ({ ...d, target: 80 }))} cx="50%" cy="50%" outerRadius={90}>
                   <PolarGrid stroke="#F1F5F9" />
