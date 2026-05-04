@@ -75,9 +75,9 @@ export default function AtRiskPage({ onLogout }: AtRiskPageProps) {
           </div>
           <button
             onClick={exportCSV}
-            className="text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 border border-slate-200 shadow-sm"
+            className="text-[10px] font-black text-white bg-slate-900 hover:bg-slate-800 px-5 py-2.5 rounded-2xl transition-all flex items-center gap-2 shadow-xl hover:-translate-y-0.5 active:translate-y-0 uppercase tracking-widest"
           >
-            <Download className="w-3.5 h-3.5" /> Export CSV
+            <Download className="w-3.5 h-3.5" /> Export Data
           </button>
         </div>
 

@@ -137,9 +137,9 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
           
           {/* Settings Group */}
           <div className="card p-6 border-slate-200/60 shadow-sm">
-            <div className="flex items-center gap-2 mb-6 text-slate-800">
-              <Settings2 className="w-5 h-5 text-blue-600" />
-              <h3 className="font-heading font-black text-sm uppercase tracking-widest">Global Setup</h3>
+            <div className="flex items-center gap-3 mb-6 text-slate-800">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm">1</div>
+              <h3 className="font-heading font-black text-xs uppercase tracking-widest">Global Constraints</h3>
             </div>
 
             <div className="space-y-4">
@@ -170,9 +170,9 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
 
           {/* Days Group */}
           <div className="card p-6 border-slate-200/60 shadow-sm">
-            <div className="flex items-center gap-2 mb-6 text-slate-800">
-              <CalendarDays className="w-5 h-5 text-emerald-600" />
-              <h3 className="font-heading font-black text-sm uppercase tracking-widest">Active Days</h3>
+            <div className="flex items-center gap-3 mb-6 text-slate-800">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-sm">2</div>
+              <h3 className="font-heading font-black text-xs uppercase tracking-widest">Operational Window</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -198,9 +198,9 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
           {/* Faculty Group */}
           <div className="card p-6 border-slate-200/60 shadow-sm">
             <div className="flex items-center justify-between mb-6 text-slate-800">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-purple-600" />
-                <h3 className="font-heading font-black text-sm uppercase tracking-widest">Faculty</h3>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-sm">3</div>
+                <h3 className="font-heading font-black text-xs uppercase tracking-widest">Faculty Allocation</h3>
               </div>
               <button onClick={addFaculty} className="p-1.5 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors">
                 <Plus className="w-4 h-4" />
@@ -249,46 +249,60 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
           </AnimatePresence>
 
           {timetable ? (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card border-slate-200/60 shadow-xl overflow-hidden">
+            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="card border-slate-100 shadow-2xl overflow-hidden flex flex-col h-full bg-white">
+              
+              {/* Header Info */}
+              <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/20">
+                <div>
+                  <h2 className="font-heading text-xl font-black text-slate-900 uppercase tracking-tight">Academic Flow Architecture</h2>
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Generated Optimization Plan · 30m Breaks Included</p>
+                </div>
+                <div className="flex gap-2">
+                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100">
+                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                     <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">No Conflicts</span>
+                   </div>
+                </div>
+              </div>
               
               {/* Toolbar */}
-              <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center bg-white border border-slate-200 p-1.5 rounded-2xl shadow-sm">
+              <div className="px-8 py-4 border-b border-slate-50 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center bg-slate-100/50 p-1 rounded-2xl">
                   <button onClick={() => setViewMode('week')}
-                    className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${viewMode === 'week' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
-                    Horizontal
+                    className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'week' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>
+                    Horizontal Matrix
                   </button>
                   <button onClick={() => setViewMode('day')}
-                    className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${viewMode === 'day' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
-                    Day View
+                    className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'day' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>
+                    Columnar View
                   </button>
                 </div>
 
                 <div className="flex items-center gap-3">
                   {viewMode === 'day' && (
                     <select value={selectedDay} onChange={e => setSelectedDay(e.target.value)}
-                      className="bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-xs font-black text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20">
+                      className="bg-white border border-slate-100 rounded-xl px-4 py-2.5 text-[10px] font-black text-slate-900 uppercase tracking-widest outline-none focus:ring-2 focus:ring-slate-900/5 shadow-sm">
                       {activeDays.map(d => <option key={d} value={d}>{d}{halfDays.includes(d) ? ' (Half)' : ''}</option>)}
                     </select>
                   )}
-                  <button onClick={handleExport} className="flex items-center gap-2 bg-white border border-slate-200 px-5 py-2.5 rounded-2xl text-xs font-black text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
-                    <Download className="w-4 h-4" /> Export
+                  <button onClick={handleExport} className="flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-slate-200">
+                    <Download className="w-3.5 h-3.5" /> Export Data
                   </button>
                 </div>
               </div>
 
               {/* Responsive Grid */}
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto scrollbar-premium">
                 {viewMode === 'week' ? (
                   <table className="w-full border-collapse">
                     <thead>
                       <tr>
-                        <th className="p-6 text-left bg-slate-50/30 border-b border-slate-100 w-32">
-                          <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Day \ Time</span>
+                        <th className="p-8 text-left bg-slate-50/30 border-b border-slate-100 w-40 sticky left-0 z-20 backdrop-blur-md">
+                          <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Matrix \ Timeline</span>
                         </th>
                         {timeSlots.map(slot => (
-                          <th key={slot.start} className="p-4 border-b border-slate-100 text-center bg-slate-50/30 min-w-[160px]">
-                            <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full">{slot.start} - {slot.end}</span>
+                          <th key={slot.start} className="p-4 border-b border-slate-50 text-center bg-white min-w-[200px]">
+                            <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.15em] bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">{slot.start} — {slot.end}</span>
                           </th>
                         ))}
                       </tr>
@@ -298,47 +312,54 @@ export default function TimetablePage({ onLogout }: TimetablePageProps) {
                         const isHalf = halfDays.includes(day)
                         return (
                           <tr key={day} className="group border-b border-slate-50 last:border-0">
-                            <td className="p-6 bg-slate-50/10 group-hover:bg-slate-50 transition-colors">
-                              <div className="flex items-center gap-2">
-                                <span className="font-black text-slate-900 text-sm">{day}</span>
-                                {isHalf && <Sun className="w-4 h-4 text-amber-500" />}
+                            <td className="p-8 bg-white sticky left-0 z-10 border-r border-slate-50 shadow-[4px_0_12px_rgba(0,0,0,0.02)]">
+                              <div className="flex items-center gap-3">
+                                <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">{day}</span>
+                                {isHalf && <Sun className="w-4 h-4 text-amber-500 fill-amber-500/20" />}
                               </div>
                             </td>
-                            {timeSlots.map(slot => {
+                            {timeSlots.map((slot, sIdx) => {
                               const classSlot = timetable[day]?.find(s => s.startTime === slot.start)
                               const isAfterHalfDay = isHalf && timeToMinutes(slot.start) >= timeToMinutes(halfDayEnd)
                               
-                              if (isAfterHalfDay) {
-                                return (
-                                  <td key={slot.start} className="p-2 bg-slate-50/30">
-                                    <div className="h-20 flex items-center justify-center border border-slate-100/50 rounded-3xl opacity-20 bg-slate-100/30 grayscale">
-                                      <span className="text-[9px] font-black uppercase tracking-tighter">Off</span>
-                                    </div>
-                                  </td>
-                                )
-                              }
+                              // Check if there was a break before this slot
+                              const prevSlot = timeSlots[sIdx - 1]
+                              const hasBreakBefore = prevSlot && timeToMinutes(slot.start) > timeToMinutes(prevSlot.end)
 
                               return (
-                                <td key={slot.start} className="p-2">
-                                  {classSlot ? (
-                                    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
-                                      className="h-24 p-4 rounded-[2rem] border transition-all hover:scale-[1.02] hover:shadow-lg relative overflow-hidden group/item cursor-pointer"
-                                      style={{ background: `${classSlot.color}08`, borderColor: `${classSlot.color}20` }}>
+                                <td key={slot.start} className="p-3 relative">
+                                  {hasBreakBefore && (
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-20">
+                                       <div className="bg-amber-50 text-amber-600 text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded border border-amber-100 transform -rotate-90">Break</div>
+                                    </div>
+                                  )}
+                                  
+                                  {isAfterHalfDay ? (
+                                    <div className="h-28 flex items-center justify-center border border-slate-100/50 rounded-[2.5rem] bg-slate-50/50 grayscale opacity-40">
+                                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300">Off-Duty</span>
+                                    </div>
+                                  ) : classSlot ? (
+                                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                                      className="h-28 p-5 rounded-[2.5rem] border transition-all hover:scale-[1.02] hover:shadow-2xl relative overflow-hidden group/item cursor-pointer shadow-sm"
+                                      style={{ background: `${classSlot.color}05`, borderColor: `${classSlot.color}20` }}>
                                       <div className="relative z-10 flex flex-col h-full justify-between">
-                                        <div className="font-black text-slate-900 text-sm leading-tight">{classSlot.subject}</div>
-                                        <div className="flex items-center justify-between mt-auto">
-                                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{classSlot.faculty.split(' ').pop()}</span>
-                                          <div className="flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-lg border border-slate-100">
+                                        <div>
+                                          <div className="font-black text-slate-900 text-xs uppercase tracking-tight leading-tight mb-1">{classSlot.subject}</div>
+                                          <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{classSlot.faculty}</div>
+                                        </div>
+                                        <div className="flex items-center justify-between mt-auto pt-2">
+                                          <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-md px-3 py-1 rounded-xl border border-slate-100 shadow-sm">
                                             <MapPin className="w-2.5 h-2.5 text-slate-400" />
-                                            <span className="text-[9px] font-black text-slate-600">{classSlot.room}</span>
+                                            <span className="text-[9px] font-black text-slate-600">RM {classSlot.room}</span>
                                           </div>
+                                          <div className="w-2 h-2 rounded-full" style={{ background: classSlot.color }} />
                                         </div>
                                       </div>
-                                      <div className="absolute top-0 right-0 w-16 h-16 opacity-10 -mr-4 -mt-4 transition-transform group-hover/item:scale-110" style={{ background: classSlot.color, borderRadius: '100%' }} />
+                                      <div className="absolute -bottom-6 -right-6 w-16 h-16 opacity-10 transition-transform group-hover/item:scale-150 rounded-full" style={{ background: classSlot.color }} />
                                     </motion.div>
                                   ) : (
-                                    <div className="h-24 border-2 border-dashed border-slate-100 rounded-[2rem] flex items-center justify-center group-hover:border-slate-200 transition-all">
-                                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-400">Free</span>
+                                    <div className="h-28 border-2 border-dashed border-slate-100 rounded-[2.5rem] flex items-center justify-center group-hover:border-slate-200 transition-all bg-slate-50/10">
+                                      <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-400">Reserved</span>
                                     </div>
                                   )}
                                 </td>

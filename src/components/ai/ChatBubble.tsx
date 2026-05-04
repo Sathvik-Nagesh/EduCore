@@ -14,9 +14,9 @@ interface ChatBubbleProps {
 
 function formatContent(text: string): string {
   return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em class="text-white/70">$1</em>')
-    .replace(/`(.*?)`/g, '<code class="bg-electric-blue/15 px-1.5 py-0.5 rounded text-electric-blue text-xs font-mono">$1</code>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-900 font-black">$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em class="text-slate-600 font-medium">$1</em>')
+    .replace(/`(.*?)`/g, '<code class="bg-slate-100 px-1.5 py-0.5 rounded text-blue-600 text-[11px] font-mono border border-slate-200">$1</code>')
     .replace(/\n/g, '<br/>')
 }
 
@@ -44,9 +44,9 @@ function TypewriterText({ text }: { text: string }) {
 
   return (
     <p
-      className="text-sm text-white/90 leading-relaxed"
+      className="text-[13px] text-slate-700 leading-relaxed font-medium"
       dangerouslySetInnerHTML={{
-        __html: formatContent(displayed) + (!done ? '<span class="inline-block w-[2px] h-4 bg-electric-blue ml-0.5 animate-pulse align-middle"></span>' : ''),
+        __html: formatContent(displayed) + (!done ? '<span class="inline-block w-[2px] h-4 bg-blue-500 ml-1 animate-pulse align-middle"></span>' : ''),
       }}
     />
   )
@@ -64,27 +64,27 @@ export default function ChatBubble({ role, content, index, isStreaming, typewrit
     >
       {/* Avatar */}
       <div className={`
-        w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5
+        w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5
         ${isUser
-          ? 'bg-gradient-to-br from-electric-blue to-blue-700 shadow-lg shadow-electric-blue/20'
-          : 'bg-gradient-to-br from-emerald-500/20 to-blue-500/20 border border-white/10'
+          ? 'bg-slate-900 shadow-lg shadow-slate-200'
+          : 'bg-white border border-slate-100 shadow-sm'
         }
       `}>
         {isUser
           ? <User className="w-4 h-4 text-white" />
-          : <Bot className="w-4 h-4 text-emerald-400" />
+          : <Bot className="w-4 h-4 text-slate-900" />
         }
       </div>
 
       {/* Bubble */}
       <div className={isUser ? 'chat-bubble-user' : 'chat-bubble-ai'}>
         {isUser ? (
-          <p className="text-sm text-white/90 leading-relaxed">{content}</p>
+          <p className="text-[13px] text-white/90 leading-relaxed font-medium">{content}</p>
         ) : typewrite && !isStreaming ? (
           <TypewriterText text={content} />
         ) : (
           <p
-            className="text-sm text-white/90 leading-relaxed"
+            className="text-[13px] text-slate-700 leading-relaxed font-medium"
             dangerouslySetInnerHTML={{ __html: formatContent(content) }}
           />
         )}

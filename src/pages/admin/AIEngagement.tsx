@@ -35,10 +35,10 @@ export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="card p-5 border-navy-100/50"
+            className="card p-6 border-slate-100 shadow-xl bg-white"
           >
-            <div className="text-navy-400 text-[10px] font-bold uppercase tracking-wider mb-2">{metric.label}</div>
-            <div className="font-heading text-3xl font-black" style={{ color: metric.color }}>
+            <div className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{metric.label}</div>
+            <div className="font-heading text-3xl font-black tracking-tight" style={{ color: metric.color }}>
               <AnimatedCounter value={metric.value} suffix={metric.suffix} />
             </div>
           </motion.div>
@@ -50,11 +50,16 @@ export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="card p-6 mb-6"
+        className="card p-8 mb-6 border-slate-100 shadow-xl"
       >
-        <div className="flex items-center gap-2 mb-4">
-          <Brain className="w-5 h-5 text-purple-600" />
-          <h2 className="font-heading text-lg font-bold text-navy-800">AI Queries by Subject</h2>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center shadow-sm">
+            <Brain className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight">AI Diffusion Analytics</h2>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Queries distributed by subject volume</p>
+          </div>
         </div>
         <EngagementBar data={engagementData} height={250} />
       </motion.div>
@@ -74,16 +79,16 @@ export default function AIEngagementPage({ onLogout }: AIEngagementPageProps) {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 + i * 0.04 }}
-              className="flex items-center gap-3 p-3 rounded-xl border border-navy-100 bg-navy-50/30"
+              className="flex items-center gap-4 p-4 rounded-3xl border border-slate-50 hover:border-slate-200 transition-all hover:shadow-xl bg-slate-50/30 hover:bg-white group"
             >
-              <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                 <Brain className="w-4 h-4 text-purple-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-navy-800 text-sm font-bold truncate leading-tight italic">"{interaction.query}"</p>
-                <p className="text-navy-400 font-bold text-[10px] uppercase tracking-wider mt-0.5">{interaction.subjectName}</p>
+                <p className="text-slate-900 text-sm font-black italic tracking-tight truncate leading-tight">"{interaction.query}"</p>
+                <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] mt-1">{interaction.subjectName}</p>
               </div>
-              <span className="text-navy-300 font-bold text-[10px] uppercase tracking-wider">{new Date(interaction.createdAt).toLocaleDateString()}</span>
+              <span className="text-slate-300 font-black text-[10px] uppercase tracking-[0.2em]">{new Date(interaction.createdAt).toLocaleDateString()}</span>
             </motion.div>
           ))}
         </div>

@@ -104,28 +104,28 @@ export const STUDENT_ATTENDANCE: AttendanceRecord[] = [
 function generateHeatmapData(): DailyAttendance[] {
   const today = new Date()
   const days = eachDayOfInterval({
-    start: subDays(today, 29),
+    start: subDays(today, 83), // 12 weeks
     end: today,
   })
 
   return days.map((day, index) => {
     const dayOfWeek = day.getDay()
     // Weekend = no class
-    if (dayOfWeek === 0) return { date: format(day, 'yyyy-MM-dd'), percentage: 0, present: false }
+    if (dayOfWeek === 0 || dayOfWeek === 6) return { date: format(day, 'yyyy-MM-dd'), percentage: 0, present: false }
 
     // Simulate some holidays and drops
-    const isHoliday = [5, 12, 18].includes(index)
+    const isHoliday = [5, 12, 18, 45, 60, 72].includes(index)
     if (isHoliday) return { date: format(day, 'yyyy-MM-dd'), percentage: 0, present: false }
 
     // Realistic attendance pattern with some low days
-    const basePct = 68 + Math.sin(index * 0.5) * 15
-    const noise = (Math.random() - 0.5) * 20
-    const pct = Math.min(100, Math.max(20, basePct + noise))
+    const basePct = 72 + Math.sin(index * 0.3) * 12
+    const noise = (Math.random() - 0.5) * 15
+    const pct = Math.min(100, Math.max(10, basePct + noise))
 
     return {
       date: format(day, 'yyyy-MM-dd'),
       percentage: Math.round(pct),
-      present: pct > 50,
+      present: pct > 55,
     }
   })
 }

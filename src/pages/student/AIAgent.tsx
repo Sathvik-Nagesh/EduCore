@@ -102,11 +102,11 @@ export default function AIPage({ onLogout }: AIPageProps) {
 
         {/* Subject Tabs + Status */}
         <div className="flex items-center gap-3 flex-shrink-0 flex-wrap">
-          <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/8 rounded-2xl overflow-x-auto flex-1 min-w-0" style={{ scrollbarWidth: 'none' }}>
+          <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-2xl overflow-x-auto flex-1 min-w-0 shadow-sm" style={{ scrollbarWidth: 'none' }}>
             {SUBJECTS.map(s => (
               <button key={s.id} onClick={() => { setSelectedSubjectId(s.id); clearChat() }}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all flex-shrink-0 ${
-                  selectedSubjectId === s.id ? 'bg-electric-blue text-white shadow-lg shadow-electric-blue/20' : 'text-white/40 hover:text-white hover:bg-white/5'
+                className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex-shrink-0 ${
+                  selectedSubjectId === s.id ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
                 }`}>
                 {s.code}
               </button>
@@ -114,37 +114,37 @@ export default function AIPage({ onLogout }: AIPageProps) {
           </div>
 
           {/* Chat / Quiz toggle */}
-          <div className="flex items-center bg-white/[0.04] border border-white/8 rounded-xl p-1">
+          <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
             <button onClick={() => setMode('chat')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                mode === 'chat' ? 'bg-electric-blue text-white' : 'text-white/40 hover:text-white'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                mode === 'chat' ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-900'
               }`}>
               <MessageSquare className="w-3.5 h-3.5" /> Chat
             </button>
             <button onClick={() => setMode('quiz')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                mode === 'quiz' ? 'bg-amber-500 text-white' : 'text-white/40 hover:text-white'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                mode === 'quiz' ? 'bg-amber-500 text-white' : 'text-slate-400 hover:text-slate-900'
               }`}>
               <Trophy className="w-3.5 h-3.5" /> Quiz
             </button>
             <button onClick={() => setMode('analytics')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                mode === 'analytics' ? 'bg-emerald-500 text-white' : 'text-white/40 hover:text-white'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                mode === 'analytics' ? 'bg-emerald-500 text-white' : 'text-slate-400 hover:text-slate-900'
               }`}>
-              <Target className="w-3.5 h-3.5" /> Analytics
+              <Target className="w-3.5 h-3.5" /> Insights
             </button>
           </div>
 
           {provider && mode === 'chat' && (
-            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/8 bg-white/[0.03] flex-shrink-0">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white shadow-sm flex-shrink-0">
               <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: provider.color }} />
-              <span className="text-xs text-white/40">{provider.label}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{provider.label}</span>
             </div>
           )}
 
           {mode === 'chat' && (
             <button onClick={clearChat} title="Clear chat"
-              className="p-2.5 rounded-xl bg-white/[0.03] border border-white/8 text-white/30 hover:text-red-400 hover:border-red-400/30 transition-all flex-shrink-0">
+              className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-300 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all flex-shrink-0 shadow-sm">
               <Trash2 className="w-4 h-4" />
             </button>
           )}
@@ -152,37 +152,35 @@ export default function AIPage({ onLogout }: AIPageProps) {
 
         {/* Quiz Mode */}
         {mode === 'quiz' && (
-          <div className="flex-1 overflow-y-auto rounded-2xl border border-white/8 p-4"
-            style={{ background: 'linear-gradient(180deg, rgba(26,29,46,0.9) 0%, rgba(15,17,23,0.95) 100%)' }}>
+          <div className="flex-1 overflow-y-auto rounded-3xl border border-slate-200 p-6 bg-white shadow-xl">
             <QuizMode subjectName={selectedSubject?.name ?? 'General'} onClose={() => setMode('chat')} />
           </div>
         )}
 
         {/* Analytics Mode */}
         {mode === 'analytics' && (
-          <div className="flex-1 overflow-y-auto rounded-2xl border border-white/8 p-6"
-            style={{ background: 'var(--surface)' }}>
-            <h3 className="text-xl font-heading font-bold text-white mb-6">Learning Analytics & Suggestions</h3>
+          <div className="flex-1 overflow-y-auto rounded-3xl border border-slate-200 p-8 bg-white shadow-xl">
+            <h3 className="text-xl font-heading font-black text-slate-900 mb-6 uppercase tracking-tight">Learning Insights</h3>
             
-            <div className="mb-8 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
-              <h4 className="flex items-center gap-2 text-sm font-semibold text-emerald-400 mb-2">
-                <Sparkles className="w-4 h-4" /> AI Insight
+            <div className="mb-8 p-5 rounded-2xl border border-emerald-100 bg-emerald-50/30">
+              <h4 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 mb-3">
+                <Sparkles className="w-4 h-4" /> Strategic Assessment
               </h4>
-              <p className="text-sm text-white/80 leading-relaxed">{QUIZ_ANALYTICS.insights}</p>
+              <p className="text-sm text-slate-600 leading-relaxed font-medium">{QUIZ_ANALYTICS.insights}</p>
             </div>
 
-            <h4 className="text-sm font-semibold text-white/60 mb-4 uppercase tracking-wider">Identified Weak Topics</h4>
-            <div className="space-y-4">
+            <h4 className="text-[10px] font-black text-slate-400 mb-5 uppercase tracking-[0.2em]">Prioritized Weak Topics</h4>
+            <div className="grid md:grid-cols-2 gap-4">
               {QUIZ_ANALYTICS.weakTopics.map((topic, i) => (
-                <div key={i} className="p-4 rounded-xl border border-white/8 bg-white/[0.02]">
-                  <div className="flex items-start justify-between mb-2">
+                <div key={i} className="p-5 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:shadow-lg transition-all group">
+                  <div className="flex items-start justify-between mb-3">
                     <div>
-                      <span className="text-xs font-bold text-electric-blue px-2 py-0.5 rounded-full border border-electric-blue/20 bg-electric-blue/10 mr-2">{topic.subject}</span>
-                      <span className="font-semibold text-white">{topic.topic}</span>
+                      <span className="text-[9px] font-black text-blue-600 px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 mr-2 uppercase tracking-widest">{topic.subject}</span>
+                      <span className="font-black text-slate-900 uppercase tracking-tight">{topic.topic}</span>
                     </div>
-                    <span className="text-xs text-red-400 font-bold px-2 py-1 bg-red-400/10 rounded-lg">{topic.mistakes} mistakes</span>
+                    <span className="text-[10px] text-red-500 font-black px-2 py-1 bg-red-50 rounded-lg uppercase tracking-widest border border-red-100">{topic.mistakes} Errors</span>
                   </div>
-                  <p className="text-sm text-white/50">{topic.suggestion}</p>
+                  <p className="text-xs text-slate-500 font-medium leading-relaxed">{topic.suggestion}</p>
                 </div>
               ))}
             </div>
@@ -191,8 +189,7 @@ export default function AIPage({ onLogout }: AIPageProps) {
 
         {/* Chat Container */}
         {mode === 'chat' && <div
-          className="flex-1 overflow-hidden rounded-2xl border border-white/8 flex flex-col"
-          style={{ background: 'linear-gradient(180deg, rgba(26,29,46,0.9) 0%, rgba(15,17,23,0.95) 100%)' }}
+          className="flex-1 overflow-hidden rounded-3xl border border-slate-200 flex flex-col bg-white shadow-2xl shadow-slate-100"
         >
           {/* Repeated Topic Banner */}
           <AnimatePresence>
@@ -201,20 +198,22 @@ export default function AIPage({ onLogout }: AIPageProps) {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="px-6 py-3 flex items-center gap-3 border-b border-amber-400/10 bg-amber-400/5 flex-shrink-0"
+                className="px-6 py-4 flex items-center gap-4 border-b border-amber-100 bg-amber-50/50 flex-shrink-0"
               >
-                <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                <p className="text-sm text-amber-300 flex-1">
-                  You've asked about <strong>{repeatedTopic}</strong> several times — want a quick summary?
+                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                </div>
+                <p className="text-sm text-amber-900 font-medium flex-1">
+                  You've asked about <strong className="font-black text-amber-600">{repeatedTopic}</strong> several times — want a quick summary?
                 </p>
                 <button
                   onClick={() => { setInputValue(`Give me a quick summary of ${repeatedTopic}`); dismissRepeatedTopic() }}
-                  className="text-xs text-amber-400 border border-amber-500/30 rounded-lg px-2.5 py-1 hover:bg-amber-500/10 flex-shrink-0"
+                  className="text-[10px] font-black uppercase tracking-widest text-amber-600 border border-amber-200 rounded-lg px-3 py-1.5 hover:bg-amber-100 flex-shrink-0 transition-all"
                 >
                   Summarize
                 </button>
-                <button onClick={dismissRepeatedTopic} className="text-white/20 hover:text-white/50 flex-shrink-0">
-                  <X className="w-3 h-3" />
+                <button onClick={dismissRepeatedTopic} className="text-slate-300 hover:text-slate-500 flex-shrink-0">
+                  <X className="w-4 h-4" />
                 </button>
               </motion.div>
             )}
@@ -226,21 +225,17 @@ export default function AIPage({ onLogout }: AIPageProps) {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center h-full text-center gap-6 py-12"
+                className="flex flex-col items-center justify-center h-full text-center gap-8 py-12"
               >
                 <div
-                  className="w-20 h-20 rounded-3xl flex items-center justify-center"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(79,142,247,0.15), rgba(16,185,129,0.15))',
-                    border: '1px solid rgba(79,142,247,0.25)',
-                    boxShadow: '0 0 40px rgba(79,142,247,0.1)',
-                  }}
+                  className="w-24 h-24 rounded-[40px] flex items-center justify-center bg-white border border-slate-100 shadow-xl relative"
                 >
-                  <Bot className="w-10 h-10 text-electric-blue" />
+                  <div className="absolute inset-0 bg-blue-50/50 rounded-[40px] blur-2xl" />
+                  <Bot className="w-12 h-12 text-slate-900 relative z-10" />
                 </div>
                 <div>
-                  <h3 className="font-heading text-white font-bold text-xl mb-2">Ask me about {selectedSubject?.name}</h3>
-                  <p className="text-white/40 text-sm max-w-sm leading-relaxed">
+                  <h3 className="font-heading text-slate-900 font-black text-2xl mb-2 uppercase tracking-tight">Ask me about {selectedSubject?.name}</h3>
+                  <p className="text-slate-400 text-sm max-w-sm leading-relaxed font-medium">
                     I'm trained on your course material. Ask anything, get quizzed, or request a concept explained simply.
                   </p>
                 </div>
@@ -249,9 +244,9 @@ export default function AIPage({ onLogout }: AIPageProps) {
                     <button
                       key={p}
                       onClick={() => { setInputValue(p); textareaRef.current?.focus() }}
-                      className="flex items-center gap-1.5 text-xs px-3.5 py-2 rounded-full border border-white/10 text-white/50 hover:text-white hover:border-electric-blue/40 hover:bg-electric-blue/5 transition-all"
+                      className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all shadow-sm"
                     >
-                      <Sparkles className="w-3 h-3" />{p}
+                      <Sparkles className="w-3.5 h-3.5" />{p}
                     </button>
                   ))}
                 </div>
@@ -270,10 +265,10 @@ export default function AIPage({ onLogout }: AIPageProps) {
                       <div className="flex mt-1.5 ml-11">
                         <button
                           onClick={() => handleSpeak(msg.content)}
-                          className="text-xs text-white/25 hover:text-white/60 flex items-center gap-1 transition-colors"
+                          className="text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-slate-600 flex items-center gap-1.5 transition-colors"
                         >
-                          {isSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
-                          {isSpeaking ? 'Stop' : 'Listen'}
+                          {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                          {isSpeaking ? 'Stop playback' : 'Listen to AI'}
                         </button>
                       </div>
                     )}
@@ -282,14 +277,14 @@ export default function AIPage({ onLogout }: AIPageProps) {
 
                 {isLoading && (
                   <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 border border-white/10 mt-0.5">
-                      <Bot className="w-4 h-4 text-emerald-400" />
+                    <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 bg-white border border-slate-100 shadow-sm mt-0.5">
+                      <Bot className="w-4 h-4 text-slate-900" />
                     </div>
                     {streamingText ? (
                       <div className="chat-bubble-ai max-w-[85%]">
-                        <p className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap">
+                        <p className="text-[13px] text-slate-700 leading-relaxed whitespace-pre-wrap font-medium">
                           {streamingText}
-                          <span className="inline-block w-[2px] h-4 bg-electric-blue ml-0.5 animate-pulse align-middle" />
+                          <span className="inline-block w-[2px] h-4 bg-blue-500 ml-1 animate-pulse align-middle" />
                         </p>
                       </div>
                     ) : (
@@ -308,12 +303,12 @@ export default function AIPage({ onLogout }: AIPageProps) {
 
           {/* Quick prompt chips (after chat starts) */}
           {hasMessages && !isLoading && (
-            <div className="px-4 py-2 flex gap-2 overflow-x-auto border-t border-white/5 flex-shrink-0" style={{ scrollbarWidth: 'none' }}>
+            <div className="px-6 py-3 flex gap-2 overflow-x-auto border-t border-slate-50 flex-shrink-0 scrollbar-hide">
               {SUGGESTED_PROMPTS.map((p) => (
                 <button
                   key={p}
                   onClick={() => { setInputValue(p); textareaRef.current?.focus() }}
-                  className="text-xs px-3 py-1.5 rounded-full border border-white/8 text-white/35 hover:text-white hover:border-electric-blue/30 transition-all whitespace-nowrap flex-shrink-0"
+                  className="text-[10px] font-black uppercase tracking-widest px-3.5 py-2 rounded-xl border border-slate-100 text-slate-400 hover:text-slate-900 hover:border-slate-900 transition-all whitespace-nowrap flex-shrink-0 bg-slate-50/50"
                 >
                   {p}
                 </button>
@@ -322,20 +317,20 @@ export default function AIPage({ onLogout }: AIPageProps) {
           )}
 
           {/* Input bar */}
-          <div className="px-4 py-4 border-t border-white/5 flex-shrink-0">
+          <div className="px-6 py-6 border-t border-slate-50 flex-shrink-0 bg-slate-50/20">
             {/* Live voice indicator */}
             {isListening && (
-              <div className="flex items-center gap-2 mb-2 px-1">
+              <div className="flex items-center gap-3 mb-3 px-1">
                 <div className="flex gap-1">
-                  {[0,1,2].map(i => <div key={i} className="typing-dot" style={{ animationDelay: `${i*0.15}s` }} />)}
+                  {[0,1,2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: `${i*0.15}s` }} />)}
                 </div>
-                <span className="text-xs text-white/40 italic">
-                  {transcript ? `"${transcript}"` : 'Listening…'}
+                <span className="text-xs text-slate-400 font-bold italic">
+                  {transcript ? `"${transcript}"` : 'AI is listening to your voice…'}
                 </span>
               </div>
             )}
 
-            <div className="flex gap-2 items-end">
+            <div className="flex gap-3 items-end">
               <VoiceInput
                 isListening={isListening}
                 transcript={transcript}
@@ -352,22 +347,22 @@ export default function AIPage({ onLogout }: AIPageProps) {
                   onKeyDown={handleKeyDown}
                   placeholder={isListening ? 'Speak now…' : `Ask about ${selectedSubject?.name ?? 'your subject'}…`}
                   rows={1}
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-2xl px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-electric-blue/40 focus:bg-white/[0.07] transition-all resize-none"
-                  style={{ minHeight: '48px', maxHeight: '140px' }}
+                  className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 text-sm placeholder:text-slate-300 focus:outline-none focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5 transition-all resize-none shadow-sm font-medium"
+                  style={{ minHeight: '56px', maxHeight: '140px' }}
                 />
               </div>
 
               <button
                 onClick={handleSend}
                 disabled={!inputValue.trim() || isLoading}
-                className="p-3 rounded-xl bg-electric-blue text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-blue-500 transition-all shadow-lg shadow-electric-blue/20 flex-shrink-0"
+                className="w-14 h-14 rounded-2xl bg-slate-900 text-white disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center flex-shrink-0"
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-[10px] text-white/20 mt-2 text-center tracking-wide">
-              Enter to send · Shift+Enter for new line{supported ? ' · 🎙 for voice' : ''}
+            <p className="text-[10px] text-slate-300 mt-4 text-center font-black uppercase tracking-widest">
+              Enter to send · Shift+Enter for new line{supported ? ' · Tap mic for voice' : ''}
             </p>
           </div>
         </div>}

@@ -3,7 +3,8 @@ import PageWrapper from '../../components/layout/PageWrapper'
 import EngagementBar from '../../components/charts/EngagementBar'
 import { FACULTIES } from '../../lib/mockData'
 import { getAIEngagementBySubject } from '../../lib/mockData'
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts'
+import { CustomTooltip } from '../../lib/chartUtils'
 
 interface FacultyStatsProps {
   onLogout: () => void
@@ -31,9 +32,9 @@ export default function FacultyStats({ onLogout }: FacultyStatsProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="card p-6 mb-6"
+        className="card p-8 mb-6 border-slate-100 shadow-xl"
       >
-        <h2 className="font-heading text-lg font-bold text-navy-800 mb-5">Faculty Overview</h2>
+        <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-8">Faculty Pulse Overview</h2>
         <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
@@ -63,8 +64,8 @@ export default function FacultyStats({ onLogout }: FacultyStatsProps) {
                           {f.name.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-navy-800 font-bold text-sm">{f.name}</p>
-                          <p className="text-navy-400 font-bold text-[10px] uppercase tracking-wider">{f.department}</p>
+                          <p className="text-slate-900 font-black text-sm tracking-tight">{f.name}</p>
+                          <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest">{f.department}</p>
                         </div>
                       </div>
                     </td>
@@ -94,21 +95,21 @@ export default function FacultyStats({ onLogout }: FacultyStatsProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="card p-6"
+        className="card p-8 border-slate-100 shadow-xl"
       >
-        <h2 className="font-heading text-lg font-bold text-navy-800 mb-4">Classes Taken vs Scheduled</h2>
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={chartData} margin={{ left: -20 }}>
-            <XAxis dataKey="name" tick={{ fill: '#718096', fontSize: 12, fontWeight: 700 }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: '#718096', fontSize: 12, fontWeight: 700 }} tickLine={false} axisLine={false} />
+        <h2 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-8">Classes Distribution Index</h2>
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={chartData} margin={{ left: -20, right: 10, top: 10 }}>
+            <CartesianGrid vertical={false} stroke="#F1F5F9" strokeDasharray="3 3" />
+            <XAxis dataKey="name" tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 900 }} tickLine={false} axisLine={false} />
+            <YAxis hide />
             <Tooltip
-              contentStyle={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-              itemStyle={{ fontWeight: 700, fontSize: '12px' }}
-              labelStyle={{ color: '#64748B', fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', marginBottom: '4px' }}
+              cursor={{ fill: '#F8FAFC' }}
+              content={<CustomTooltip unit=" units" />}
             />
-            <Legend iconType="circle" wrapperStyle={{ color: '#475569', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' }} />
-            <Bar dataKey="scheduled" fill="#E2E8F0" radius={[4, 4, 0, 0]} name="Scheduled" />
-            <Bar dataKey="taken" fill="#2563EB" radius={[4, 4, 0, 0]} name="Taken" />
+            <Legend iconType="circle" wrapperStyle={{ paddingTop: 20, textTransform: 'uppercase', fontSize: 10, fontWeight: 900, color: '#94A3B8' }} />
+            <Bar dataKey="scheduled" fill="#F1F5F9" radius={[20, 20, 20, 20]} name="Scheduled" barSize={24} />
+            <Bar dataKey="taken" fill="#2563EB" radius={[20, 20, 20, 20]} name="Taken Markings" barSize={24} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>

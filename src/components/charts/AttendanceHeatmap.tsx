@@ -2,27 +2,26 @@ import { motion } from 'framer-motion'
 import { format, parseISO, getDay } from 'date-fns'
 import type { DailyAttendance } from '../../lib/mockData'
 
-
 interface AttendanceHeatmapProps {
   data: DailyAttendance[]
 }
 
 function getHeatColor(percentage: number): string {
-  if (percentage === 0) return 'rgba(255,255,255,0.04)'
-  if (percentage >= 80) return 'rgba(16,185,129,0.85)'
-  if (percentage >= 65) return 'rgba(245,158,11,0.75)'
-  if (percentage >= 40) return 'rgba(239,68,68,0.6)'
-  return 'rgba(239,68,68,0.3)'
+  if (percentage === -1) return 'transparent'
+  if (percentage === 0) return '#F1F5F9'
+  if (percentage >= 85) return '#10B981'
+  if (percentage >= 70) return '#34D399'
+  if (percentage >= 50) return '#FCD34D'
+  if (percentage >= 30) return '#F87171'
+  return '#EF4444'
 }
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
-  // Build grid: week columns, day rows (Mon-Sat)
   const weeks: DailyAttendance[][] = []
   let currentWeek: DailyAttendance[] = []
 
-  // Pad start
   if (data.length > 0) {
     const firstDay = getDay(parseISO(data[0].date))
     for (let i = 0; i < firstDay; i++) {
@@ -37,6 +36,7 @@ export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
       currentWeek = []
     }
   }
+  
   if (currentWeek.length > 0) {
     while (currentWeek.length < 7) {
       currentWeek.push({ date: '', percentage: -1, present: false })
@@ -45,46 +45,79 @@ export default function AttendanceHeatmap({ data }: AttendanceHeatmapProps) {
   }
 
   return (
-    <div>
-      <div className="flex gap-1 mb-2">
-        <div className="w-7" />
-        {weeks.map((_, i) => (
-          <div key={i} className="flex-1 text-center text-[10px] text-white/20">
-            {weeks[i][1]?.date ? format(parseISO(weeks[i][1].date), 'MMM dd') : ''}
-          </div>
-        ))}
-      </div>
-
-      {DAY_LABELS.map((day, dayIndex) => (
-        <div key={day} className="flex gap-1 mb-1 items-center">
-          <div className="w-7 text-[10px] text-white/30 text-right pr-1">{day}</div>
-          {weeks.map((week, weekIndex) => {
-            const cell = week[dayIndex]
-            if (!cell || cell.percentage === -1) {
-              return <div key={weekIndex} className="flex-1 h-5 rounded-sm" style={{ background: 'transparent' }} />
-            }
+    <div className="overflow-x-auto pb-1 scrollbar-hide">
+      <div className="inline-block p-2">
+        {/* Month Labels */}
+        <div className="flex gap-[12px] mb-4">
+          <div className="w-12" />
+          {weeks.map((week, i) => {
+            const date = week.find(d => d.date !== '')?.date
+            const currentMonth = date ? format(parseISO(date), 'MMM') : ''
+            const prevWeekDate = i > 0 ? weeks[i-1].find(d => d.date !== '')?.date : null
+            const prevMonth = prevWeekDate ? format(parseISO(prevWeekDate), 'MMM') : ''
+            
+            const shouldShow = i === 0 || (currentMonth !== prevMonth && currentMonth !== '')
+            
             return (
-              <motion.div
-                key={weekIndex}
-                className="flex-1 h-5 rounded-sm heatmap-cell"
-                style={{ background: getHeatColor(cell.percentage) }}
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: (weekIndex * 7 + dayIndex) * 0.01, duration: 0.2 }}
-                title={cell.date ? `${format(parseISO(cell.date), 'MMM dd')} — ${cell.percentage}%` : ''}
-              />
+              <div key={i} className="w-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
+                {shouldShow ? currentMonth : ''}
+              </div>
             )
           })}
         </div>
-      ))}
 
-      {/* Legend */}
-      <div className="flex items-center gap-4 mt-4 justify-end">
-        <span className="text-xs text-white/30">Less</span>
-        {[0, 40, 65, 80, 95].map(p => (
-          <div key={p} className="w-4 h-4 rounded-sm" style={{ background: getHeatColor(p) }} />
-        ))}
-        <span className="text-xs text-white/30">More</span>
+        <div className="flex flex-col gap-[12px]">
+          {DAY_LABELS.map((day, dayIndex) => (
+            <div key={day} className="flex gap-[12px] items-center">
+              <div className="w-12 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right pr-4">
+                {dayIndex % 2 === 1 ? day : ''}
+              </div>
+              {weeks.map((week, weekIndex) => {
+                const cell = week[dayIndex]
+                const color = getHeatColor(cell?.percentage ?? -1)
+                
+                return (
+                  <motion.div
+                    key={`${weekIndex}-${dayIndex}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      delay: (weekIndex * 0.005) + (dayIndex * 0.002),
+                      duration: 0.2
+                    }}
+                    className="w-8 h-8 rounded-xl shadow-sm relative group cursor-help transition-all hover:scale-125 active:scale-90 z-10 border border-slate-100/10"
+                    style={{ backgroundColor: color }}
+                  >
+                    {cell && cell.percentage !== -1 && (
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-5 py-3 bg-slate-900 text-white text-[10px] font-bold rounded-2xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap z-50 pointer-events-none shadow-2xl border border-white/10 translate-y-1 group-hover:translate-y-0">
+                        <div className="text-slate-400 font-black uppercase tracking-widest text-[8px] mb-1.5">{format(parseISO(cell.date), 'EEEE, MMM dd')}</div>
+                        <div className="text-sm font-black tracking-tight">{cell.percentage > 0 ? `${cell.percentage}% Participation` : 'No Classes'}</div>
+                        {cell.percentage > 0 && <div className={`text-[9px] font-black uppercase mt-1.5 ${cell.present ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {cell.present ? 'Status: Verified Present' : 'Status: Recorded Absent'}
+                        </div>}
+                      </div>
+                    )}
+                  </motion.div>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* Legend */}
+        <div className="flex items-center gap-3 mt-8 justify-end">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Engagement Low</span>
+          <div className="flex gap-[4px]">
+            {[0, 30, 50, 70, 90].map(p => (
+              <div 
+                key={p} 
+                className="w-4 h-4 rounded-[3px] shadow-inner" 
+                style={{ backgroundColor: getHeatColor(p) }} 
+              />
+            ))}
+          </div>
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">High</span>
+        </div>
       </div>
     </div>
   )

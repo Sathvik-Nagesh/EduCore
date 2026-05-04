@@ -20,16 +20,30 @@ const TreemapContent = (props: any) => {
   const { x, y, width, height, name, pct, dept } = props
   if (width < 30 || height < 20) return null
   const col = DEPT_COLORS[dept] || '#4F8EF7'
+  const words = name.split(' ')
+  const isTooWide = name.length > 10 && width < 80
+  
   return (
     <g>
-      <rect x={x} y={y} width={width} height={height} rx={8}
-        style={{ fill: `${col}20`, stroke: col, strokeWidth: 1, strokeOpacity: 0.4 }} />
-      {width > 50 && height > 30 && (
+      <rect x={x} y={y} width={width} height={height} rx={12}
+        style={{ fill: 'white', stroke: '#F1F5F9', strokeWidth: 2 }} />
+      <rect x={x + 4} y={y + 4} width={width - 8} height={height - 8} rx={8}
+        style={{ fill: `${col}10`, stroke: col, strokeWidth: 1.5, strokeOpacity: 0.3 }} />
+      {width > 40 && height > 30 && (
         <>
-          <text x={x + width / 2} y={y + height / 2 - 6} textAnchor="middle"
-            style={{ fill: '#1E293B', fontSize: 11, fontWeight: 700 }}>{name}</text>
-          <text x={x + width / 2} y={y + height / 2 + 10} textAnchor="middle"
-            style={{ fill: col, fontSize: 10, fontWeight: 600 }}>{pct}%</text>
+          {isTooWide ? (
+            <>
+              <text x={x + width / 2} y={y + height / 2 - 8} textAnchor="middle"
+                style={{ fill: '#0F172A', fontSize: 9, fontWeight: 900, textTransform: 'uppercase' }}>{words[0]}</text>
+              <text x={x + width / 2} y={y + height / 2 + 2} textAnchor="middle"
+                style={{ fill: '#0F172A', fontSize: 9, fontWeight: 900, textTransform: 'uppercase' }}>{words.slice(1).join(' ')}</text>
+            </>
+          ) : (
+            <text x={x + width / 2} y={y + height / 2 - 4} textAnchor="middle"
+              style={{ fill: '#0F172A', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{name}</text>
+          )}
+          <text x={x + width / 2} y={y + height / 2 + 14} textAnchor="middle"
+            style={{ fill: col, fontSize: 11, fontWeight: 800 }}>{pct}%</text>
         </>
       )}
     </g>
@@ -97,10 +111,16 @@ export default function AdminDashboard({ onLogout }: Props) {
   }, [])
 
   const kpis = [
-    { label: 'Total Students', value: stats.totalStudents,   unit: '',  color: '#4F8EF7', icon: Users },
-    { label: 'At Risk',        value: AT_RISK.length,        unit: '',  color: '#EF4444', icon: AlertTriangle },
-    { label: 'AI Queries',     value: aiData.length || stats.aiInteractions, unit: '', color: '#8B5CF6', icon: Brain },
-    { label: 'Campus Avg',     value: stats.campusAttendance, unit: '%', color: '#10B981', icon: TrendingUp },
+    { label: 'Enrollments', value: stats.totalStudents,   unit: '',  color: '#0F172A', icon: Users },
+    { label: 'Risk Indices',    value: AT_RISK.length,        unit: '',  color: '#EF4444', icon: AlertTriangle },
+    { label: 'AI Synthesis',    value: aiData.length || stats.aiInteractions, unit: '', color: '#8B5CF6', icon: Brain },
+    { label: 'Campus Avg',      value: stats.campusAttendance, unit: '%', color: '#10B981', icon: TrendingUp },
+  ]
+
+  const PENDING_APPROVALS = [
+    { id: 1, type: 'Medical Leave', student: 'Rahul Verma', date: 'Oct 24, 2023', status: 'Pending Verification' },
+    { id: 2, type: 'Faculty Access', user: 'Dr. Sarah Wilson', date: 'Oct 25, 2023', status: 'Identity Check' },
+    { id: 3, type: 'Syllabus Update', subject: 'Machine Learning', date: 'Oct 26, 2023', status: 'Approval Required' }
   ]
 
   return (
@@ -132,9 +152,9 @@ export default function AdminDashboard({ onLogout }: Props) {
 
         {/* ── At-Risk Treemap ───────────────────────────────────── */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }} className="card p-6 lg:col-span-2">
-          <h3 className="font-heading text-lg font-bold text-slate-800 mb-1">At-Risk Students</h3>
-          <p className="text-xs text-slate-400 font-black mb-4 uppercase tracking-widest">Attendance below 75% threshold</p>
+          transition={{ delay: 0.1 }} className="card p-8 lg:col-span-2 shadow-xl border-slate-100">
+          <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Behavioral Risk Matrix</h3>
+          <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Attendance below 75% threshold</p>
           <ResponsiveContainer width="100%" height={230}>
             <Treemap
               data={AT_RISK.map(s => ({ ...s, size: 75 - s.pct }))}
@@ -145,10 +165,9 @@ export default function AdminDashboard({ onLogout }: Props) {
                 if (!active || !payload?.length) return null
                 const d = payload[0]?.payload
                 return (
-                  <div style={{ background:'rgba(255,255,255,0.95)', backdropFilter:'blur(8px)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:12, padding:'10px 14px', boxShadow:'0 10px 25px rgba(239,68,68,0.1)' }}>
-                    <p style={{ color:'#0F172A', fontWeight:800, fontSize:13 }}>{d?.name}</p>
-                    <p style={{ color:'#EF4444', fontSize:11, fontWeight:700 }}>{d?.pct}% attendance</p>
-                    <p style={{ color:'#94A3B8', fontSize:10, fontWeight:500 }}>{75 - d?.pct}% below threshold</p>
+                  <div className="card px-4 py-3 bg-white/90 backdrop-blur-xl border-slate-100 shadow-2xl">
+                    <p className="text-slate-900 font-black text-xs uppercase tracking-tight">{d?.name}</p>
+                    <p className="text-red-500 font-black text-lg mt-1">{d?.pct}% <span className="text-[10px] text-slate-400 font-medium">Attendance</span></p>
                   </div>
                 )
               }} />
@@ -158,56 +177,83 @@ export default function AdminDashboard({ onLogout }: Props) {
 
         {/* ── Campus Activity Line + Brush ─────────────────────── */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.15 }} className="card p-6 lg:col-span-3">
-          <h3 className="font-heading text-lg font-bold text-slate-800 mb-1">Campus Activity</h3>
-          <p className="text-xs text-slate-400 font-black mb-4 uppercase tracking-widest">Active students vs AI queries (30 days)</p>
+          transition={{ delay: 0.15 }} className="card p-8 lg:col-span-3 shadow-xl border-slate-100">
+          <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Campus Activity Synthesis</h3>
+          <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Live utilization: Active users vs AI synthesized queries</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={ACTIVITY} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <CartesianGrid {...GRID_STYLE} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
               <XAxis dataKey="day" {...AXIS_STYLE} tick={{ ...AXIS_STYLE.tick, fontSize: 9 }} interval={4} />
-              <YAxis {...AXIS_STYLE} />
+              <YAxis {...AXIS_STYLE} hide />
               <Tooltip content={<CustomTooltip unit="%" />} />
-              <Line type="monotone" dataKey="active" name="Active Students"
-                stroke="#4F8EF7" strokeWidth={2} dot={false} />
+              <Line type="stepAfter" dataKey="active" name="Active Students"
+                stroke="#0F172A" strokeWidth={3} dot={false} />
               <Line type="monotone" dataKey="ai" name="AI Queries"
-                stroke="#8B5CF6" strokeWidth={2} dot={false} strokeDasharray="4 2" />
-              <Brush dataKey="day" height={24} travellerWidth={8}
-                stroke="#E2E8F0"
+                stroke="#8B5CF6" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+              <Brush dataKey="day" height={24} travellerWidth={10}
+                stroke="#F1F5F9"
                 fill="#F8FAFC" />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
       </div>
 
-      {/* ── AI Usage Scatter ───────────────────────────────────── */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }} className="card p-6">
-        <h3 className="font-heading text-lg font-bold text-slate-800 mb-1">AI Usage vs Attendance Correlation</h3>
-        <p className="text-xs text-slate-400 font-black mb-4 uppercase tracking-widest">Cross-metric behavioral analysis</p>
-        <ResponsiveContainer width="100%" height={200}>
-          <ScatterChart margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
-            <CartesianGrid {...GRID_STYLE} />
-            <XAxis type="number" dataKey="ai" name="AI Queries" {...AXIS_STYLE}
-              label={{ value: 'AI Queries', position: 'insideBottom', offset: -2, fill: '#94A3B8', fontSize: 10, fontWeight: 700 }} />
-            <YAxis type="number" dataKey="attendance" name="Attendance" {...AXIS_STYLE}
-              domain={[45, 100]} />
-            <ZAxis range={[60, 160]} />
-            <Tooltip content={<ScatterTip />} cursor={{ stroke: 'rgba(0,0,0,0.05)' }} />
-            <Scatter data={SCATTER_DATA}>
-              {SCATTER_DATA.map((d, i) => (
-                <Cell key={i}
-                  fill={d.attendance >= 75 ? '#10B981' : d.attendance >= 60 ? '#F59E0B' : '#EF4444'}
-                  fillOpacity={0.8} />
-              ))}
-            </Scatter>
-          </ScatterChart>
-        </ResponsiveContainer>
-        <div className="flex gap-6 mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-          <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm" /> Above 75%</span>
-          <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" /> 60–75%</span>
-          <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" /> Below 60%</span>
-        </div>
-      </motion.div>
+      <div className="grid lg:grid-cols-3 gap-5 mb-5">
+        {/* Pending Approvals */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }} className="card p-8 shadow-xl border-slate-100 lg:col-span-1">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight">Pending Verifications</h3>
+            <span className="bg-amber-100 text-amber-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">{PENDING_APPROVALS.length} New</span>
+          </div>
+          <div className="space-y-4">
+            {PENDING_APPROVALS.map((req) => (
+              <div key={req.id} className="p-4 rounded-2xl border border-slate-100 bg-slate-50/30 hover:bg-white hover:shadow-lg transition-all group">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{req.type}</span>
+                  <span className="text-[9px] font-bold text-slate-400">{req.date}</span>
+                </div>
+                <h4 className="font-black text-slate-900 text-sm mb-1">{req.student || req.user || req.subject}</h4>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    {req.status}
+                  </span>
+                  <button className="text-[10px] font-black uppercase tracking-widest text-slate-900 bg-white border border-slate-200 px-3 py-1.5 rounded-xl group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all shadow-sm">Review</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* AI Correlation Scatter */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }} className="card p-8 shadow-xl border-slate-100 lg:col-span-2">
+          <h3 className="font-heading text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Intelligence Correlation</h3>
+          <p className="text-[10px] text-slate-400 font-black mb-6 uppercase tracking-[0.2em]">Cross-metric analysis: AI Engagement vs Student Attendance</p>
+          <ResponsiveContainer width="100%" height={260}>
+            <ScatterChart margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+              <XAxis type="number" dataKey="ai" name="AI Queries" {...AXIS_STYLE} hide />
+              <YAxis type="number" dataKey="attendance" name="Attendance" {...AXIS_STYLE} domain={[45, 100]} hide />
+              <ZAxis range={[100, 300]} />
+              <Tooltip content={<ScatterTip />} cursor={{ stroke: 'rgba(0,0,0,0.05)' }} />
+              <Scatter data={SCATTER_DATA}>
+                {SCATTER_DATA.map((d, i) => (
+                  <Cell key={i}
+                    fill={d.attendance >= 75 ? '#10B981' : d.attendance >= 60 ? '#F59E0B' : '#EF4444'}
+                    fillOpacity={0.9} />
+                ))}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+          <div className="flex gap-6 mt-6 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 justify-center">
+            <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm" /> High Perf</span>
+            <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" /> Median</span>
+            <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" /> Critical</span>
+          </div>
+        </motion.div>
+      </div>
     </PageWrapper>
   )
 }

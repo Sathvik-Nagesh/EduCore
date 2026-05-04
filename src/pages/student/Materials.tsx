@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { FileText, Presentation, Download, Search, BookOpen, Calendar, User, Eye, Filter } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { FileText, Presentation, Download, Search, BookOpen, Calendar, User, Eye, Filter, ArrowRight } from 'lucide-react'
 import PageWrapper from '../../components/layout/PageWrapper'
 import { STUDY_MATERIALS, SUBJECTS, type StudyMaterial } from '../../lib/mockData'
 import toast from 'react-hot-toast'
@@ -8,11 +8,11 @@ import toast from 'react-hot-toast'
 interface MaterialsPageProps { onLogout: () => void }
 
 const FILE_ICONS: Record<StudyMaterial['fileType'], { icon: typeof FileText; color: string; bg: string }> = {
-  pdf:   { icon: FileText,     color: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
-  ppt:   { icon: Presentation, color: '#F59E0B', bg: 'rgba(245,158,11,0.15)' },
-  doc:   { icon: FileText,     color: '#4F8EF7', bg: 'rgba(79,142,247,0.15)' },
-  video: { icon: Eye,          color: '#8B5CF6', bg: 'rgba(139,92,246,0.15)' },
-  link:  { icon: BookOpen,     color: '#10B981', bg: 'rgba(16,185,129,0.15)' },
+  pdf:   { icon: FileText,     color: '#EF4444', bg: 'rgba(239,68,68,0.08)' },
+  ppt:   { icon: Presentation, color: '#F59E0B', bg: 'rgba(245,158,11,0.08)' },
+  doc:   { icon: FileText,     color: '#3B82F6', bg: 'rgba(59,130,246,0.08)' },
+  video: { icon: Eye,          color: '#8B5CF6', bg: 'rgba(139,92,246,0.08)' },
+  link:  { icon: BookOpen,     color: '#10B981', bg: 'rgba(16,185,129,0.08)' },
 }
 
 export default function MaterialsPage({ onLogout }: MaterialsPageProps) {
@@ -40,116 +40,140 @@ export default function MaterialsPage({ onLogout }: MaterialsPageProps) {
     toast.success(`Downloading "${m.title}"…`)
   }
 
-  const groupedByChapter = useMemo(() => {
-    const groups: Record<string, StudyMaterial[]> = {}
-    for (const m of filtered) {
-      const key = `${m.subjectCode} · ${m.chapter}`
-      if (!groups[key]) groups[key] = []
-      groups[key].push(m)
-    }
-    return groups
-  }, [filtered])
-
   return (
     <PageWrapper role="student" userName={user.name || 'Student'} onLogout={onLogout}
-      title="Study Materials" subtitle="All uploaded resources from your faculty">
+      title="Study Library" subtitle="High-quality resources for your academic growth">
 
-      {/* Subject Tabs */}
-      <div className="flex items-center gap-1 p-1 bg-navy-50 border border-navy-100 rounded-2xl overflow-x-auto mb-5 flex-shrink-0" style={{ scrollbarWidth: 'none' }}>
-        <button onClick={() => setSelectedSubject('all')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 ${selectedSubject === 'all' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-navy-400 hover:text-navy-800 hover:bg-navy-100'}`}>
-          All Subjects
-        </button>
-        {SUBJECTS.map(s => (
-          <button key={s.id} onClick={() => setSelectedSubject(s.id)}
-            className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 ${selectedSubject === s.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-navy-400 hover:text-navy-800 hover:bg-navy-100'}`}>
-            {s.code}
-          </button>
-        ))}
-      </div>
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Sidebar Filters */}
+        <div className="w-full lg:w-72 flex-shrink-0 space-y-6">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input 
+              value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Quick search..."
+              className="w-full h-12 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 text-sm text-slate-900 font-bold placeholder:text-slate-300 focus:outline-none focus:border-blue-500/40 focus:ring-4 focus:ring-blue-500/5 transition-all shadow-sm" 
+            />
+          </div>
 
-      {/* Search + Filter bar */}
-      <div className="flex gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy-300" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search materials, topics, chapters…"
-            className="w-full h-11 bg-white border border-navy-100 rounded-xl pl-10 pr-4 text-sm text-navy-800 font-bold placeholder:text-navy-300 focus:outline-none focus:border-blue-500/40 focus:ring-4 focus:ring-blue-500/5 transition-all shadow-sm" />
+          {/* Subject Select */}
+          <div className="space-y-3">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Filter by Subject</h3>
+            <div className="flex flex-col gap-1.5">
+              <button 
+                onClick={() => setSelectedSubject('all')}
+                className={`px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-left flex items-center justify-between group ${selectedSubject === 'all' ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'bg-white border border-slate-200 text-slate-400 hover:border-slate-300'}`}
+              >
+                All Modules
+                {selectedSubject === 'all' && <ArrowRight className="w-3.5 h-3.5" />}
+              </button>
+              {SUBJECTS.map(s => (
+                <button 
+                  key={s.id} onClick={() => setSelectedSubject(s.id)}
+                  className={`px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-left flex items-center justify-between group ${selectedSubject === s.id ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'bg-white border border-slate-200 text-slate-400 hover:border-slate-300'}`}
+                >
+                  {s.code}
+                  {selectedSubject === s.id && <ArrowRight className="w-3.5 h-3.5" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Type Filter */}
+          <div className="space-y-3">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Resource Type</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {['all', 'pdf', 'ppt', 'video', 'link'].map(type => (
+                <button
+                  key={type}
+                  onClick={() => setFilterType(type)}
+                  className={`py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${filterType === type ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100' : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'}`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-navy-300" />
-          <select value={filterType} onChange={e => setFilterType(e.target.value)}
-            className="h-11 bg-white border border-navy-100 rounded-xl pl-9 pr-8 text-sm text-navy-800 font-bold focus:outline-none focus:border-blue-500/40 appearance-none shadow-sm">
-            <option value="all">All Types</option>
-            <option value="pdf">PDF</option>
-            <option value="ppt">PPT</option>
-            <option value="doc">DOC</option>
-            <option value="video">Video</option>
-          </select>
-        </div>
-      </div>
 
-      {/* Stats */}
-      <div className="flex items-center gap-4 mb-6 text-xs text-navy-400 font-bold uppercase tracking-wider px-1">
-        <span>{filtered.length} materials</span>
-        <span className="opacity-30">·</span>
-        <span>{Object.keys(groupedByChapter).length} chapters</span>
-        {search && <span>· Results for "<strong className="text-blue-600">{search}</strong>"</span>}
-      </div>
+        {/* Content Area */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-6 px-1">
+            <div className="flex items-center gap-4 text-[10px] text-slate-400 font-black uppercase tracking-widest">
+              <span>{filtered.length} resources found</span>
+              <span className="w-1 h-1 rounded-full bg-slate-200" />
+              <span>Sorted by Recency</span>
+            </div>
+          </div>
 
-      {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center bg-navy-50/50 rounded-2xl border-2 border-dashed border-navy-100">
-          <BookOpen className="w-12 h-12 text-navy-200 mb-4" />
-          <p className="text-navy-400 font-bold">No materials match your filters</p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {Object.entries(groupedByChapter).map(([group, items], gi) => (
-            <div key={group}>
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-navy-300 mb-3 px-1">{group}</h3>
-              <div className="grid gap-3 md:grid-cols-2">
-                {items.map((m, i) => {
+          {filtered.length === 0 ? (
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center py-32 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200"
+            >
+              <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-sm mb-6">
+                <BookOpen className="w-10 h-10 text-slate-200" />
+              </div>
+              <h4 className="text-slate-900 font-black uppercase tracking-widest text-sm mb-2">No matches found</h4>
+              <p className="text-slate-400 text-xs font-medium max-w-xs mx-auto">Try adjusting your filters or search query to find what you're looking for.</p>
+            </motion.div>
+          ) : (
+            <div className="grid gap-3">
+              <AnimatePresence mode="popLayout">
+                {filtered.map((m, i) => {
                   const meta = FILE_ICONS[m.fileType]
                   const Icon = meta.icon
                   return (
-                      <motion.div key={m.id}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: (gi * 0.05) + (i * 0.04) }}
-                        className="card p-5 flex items-start gap-4 group hover:shadow-card transition-all cursor-pointer bg-white">
+                    <motion.div
+                      layout
+                      key={m.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2, delay: i * 0.03 }}
+                      className="group bg-white border border-slate-100 rounded-2xl p-4 hover:shadow-xl hover:shadow-slate-100 transition-all flex items-center gap-6"
+                    >
+                      <div 
+                        className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0"
+                        style={{ background: meta.bg, border: `1px solid ${meta.color}15` }}
+                      >
+                        <Icon className="w-5 h-5" style={{ color: meta.color }} />
+                      </div>
 
-                        {/* File icon */}
-                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
-                          style={{ background: meta.bg.replace('0.15', '0.08'), border: `1px solid ${meta.color}20` }}>
-                          <Icon className="w-6 h-6" style={{ color: meta.color }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-[9px] font-black uppercase tracking-[0.15em] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                            {m.subjectCode}
+                          </span>
+                          <h4 className="text-slate-900 font-black text-sm truncate group-hover:text-blue-600 transition-colors">
+                            {m.title}
+                          </h4>
                         </div>
-
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-navy-800 font-bold text-sm mb-1 truncate">{m.title}</h4>
-                          <p className="text-navy-500 text-xs leading-relaxed mb-3 line-clamp-2 font-medium">{m.description}</p>
-
-                          <div className="flex items-center gap-3 text-[10px] text-navy-400 font-bold uppercase tracking-wider flex-wrap">
-                            <span className="flex items-center gap-1"><User className="w-2.5 h-2.5" />{m.uploadedBy.split(' ').pop()}</span>
-                            <span className="flex items-center gap-1"><Calendar className="w-2.5 h-2.5" />{new Date(m.uploadedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
-                            <span className="bg-navy-50 px-1.5 py-0.5 rounded-md">{m.fileSize}</span>
-                            {m.pages && <span className="bg-navy-50 px-1.5 py-0.5 rounded-md">{m.pages} pages</span>}
-                          </div>
+                        <div className="flex items-center gap-4 text-[10px] text-slate-400 font-black uppercase tracking-tight">
+                           <span>{m.chapter}</span>
+                           <span className="w-1 h-1 rounded-full bg-slate-200" />
+                           <span className="flex items-center gap-1.5"><User className="w-3 h-3" /> {m.uploadedBy}</span>
                         </div>
+                      </div>
 
-                        {/* Download button */}
-                        <button onClick={() => handleDownload(m)}
-                          className="p-3 rounded-xl bg-navy-50 border border-navy-100 text-navy-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all flex-shrink-0 opacity-0 group-hover:opacity-100 shadow-sm">
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{m.fileSize}</span>
+                        <button 
+                          onClick={() => handleDownload(m)}
+                          className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 flex items-center justify-center hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+                        >
                           <Download className="w-4 h-4" />
                         </button>
-                      </motion.div>
+                      </div>
+                    </motion.div>
                   )
                 })}
-              </div>
+              </AnimatePresence>
             </div>
-          ))}
+          )}
         </div>
-      )}
+      </div>
     </PageWrapper>
   )
 }
