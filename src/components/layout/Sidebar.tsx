@@ -16,10 +16,11 @@ interface NavItem {
 }
 
 const studentNav: NavItem[] = [
-  { label: 'Dashboard', to: '/student', icon: LayoutDashboard },
-  { label: 'Attendance', to: '/student/attendance', icon: CalendarCheck },
-  { label: 'Heatmap', to: '/student/heatmap', icon: BarChart2 },
-  { label: 'AI Study Agent', to: '/student/ai', icon: Brain },
+  { label: 'Dashboard',     to: '/student',           icon: LayoutDashboard },
+  { label: 'Attendance',    to: '/student/attendance', icon: CalendarCheck },
+  { label: 'Heatmap',       to: '/student/heatmap',   icon: BarChart2 },
+  { label: 'Materials',     to: '/student/materials', icon: BookOpen },
+  { label: 'AI Study Agent',to: '/student/ai',        icon: Brain },
 ]
 
 const facultyNav: NavItem[] = [

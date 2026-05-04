@@ -44,7 +44,8 @@ export function generateTimetable(
   startTime = '09:00',
   endTime = '17:00',
   classDuration = 60,
-  workingDays = DAYS
+  workingDays = DAYS,
+  dayEndTimes: Record<string, string> = {}
 ): TimetableGrid {
   const grid: TimetableGrid = {}
   for (const day of workingDays) {
@@ -60,29 +61,33 @@ export function generateTimetable(
   // Assign colors to faculties
   const facultyColorMap: Record<string, string> = {}
   faculties.forEach((f, i) => {
-    facultyColorMap[f.id] = COLORS[i % COLORS.length]
+    facultyColorMap[f.id] = f.color || COLORS[i % COLORS.length]
   })
 
-  // Generate all time slots
-  const startMin = timeToMinutes(startTime)
-  const endMin = timeToMinutes(endTime)
-  const timeSlots: string[] = []
-  for (let t = startMin; t + classDuration <= endMin; t += classDuration) {
-    timeSlots.push(minutesToTime(t))
+  // Build time slots per day (respects half-day end times)
+  const daySlotsMap: Record<string, string[]> = {}
+  for (const day of workingDays) {
+    const dayEnd = dayEndTimes[day] || endTime
+    const startMin = timeToMinutes(startTime)
+    const endMin = timeToMinutes(dayEnd)
+    const slots: string[] = []
+    for (let t = startMin; t + classDuration <= endMin; t += classDuration) {
+      slots.push(minutesToTime(t))
+    }
+    daySlotsMap[day] = slots
   }
 
   // Build a list of all subject-faculty assignments to schedule
   const assignments: Array<{ faculty: FacultyConstraint; subject: string }> = []
   for (const faculty of faculties) {
     for (const subject of faculty.subjects) {
-      // Schedule each subject ~3 times per week
       for (let i = 0; i < 3; i++) {
         assignments.push({ faculty, subject })
       }
     }
   }
 
-  // Shuffle assignments for variety
+  // Shuffle
   for (let i = assignments.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [assignments[i], assignments[j]] = [assignments[j], assignments[i]]
@@ -95,12 +100,11 @@ export function generateTimetable(
     let placed = false
     for (const day of workingDays) {
       if (placed) break
-      for (const slot of timeSlots) {
+      for (const slot of daySlotsMap[day]) {
         if (placed) break
 
         const slotEnd = minutesToTime(timeToMinutes(slot) + classDuration)
 
-        // Check for faculty conflict on this day/slot
         const conflict = grid[day].some(
           s => s.facultyId === faculty.id &&
             timeToMinutes(s.startTime) < timeToMinutes(slotEnd) &&
@@ -110,14 +114,9 @@ export function generateTimetable(
         if (!conflict) {
           const room = ROOMS[Math.floor(Math.random() * ROOMS.length)]
           grid[day].push({
-            day,
-            startTime: slot,
-            endTime: slotEnd,
-            subject,
-            faculty: faculty.name,
-            facultyId: faculty.id,
-            room,
-            color: facultyColorMap[faculty.id],
+            day, startTime: slot, endTime: slotEnd,
+            subject, faculty: faculty.name, facultyId: faculty.id,
+            room, color: facultyColorMap[faculty.id],
           })
           hoursUsed[faculty.id] += classDuration / 60
           placed = true
@@ -126,7 +125,7 @@ export function generateTimetable(
     }
   }
 
-  // Sort each day's slots by time
+  // Sort each day by start time
   for (const day of workingDays) {
     grid[day].sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime))
   }

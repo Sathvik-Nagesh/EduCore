@@ -1,16 +1,20 @@
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
+import CookieConsent from './components/layout/CookieConsent'
 
 // Pages
 import Landing from './pages/Landing'
 import Login from './pages/Login'
+import Privacy from './pages/Privacy'
+import Terms from './pages/Terms'
 
 // Student
 import StudentDashboard from './pages/student/Dashboard'
 import AttendancePage from './pages/student/Attendance'
 import HeatmapPage from './pages/student/Heatmap'
 import AIPage from './pages/student/AIAgent'
+import MaterialsPage from './pages/student/Materials'
 
 // Faculty
 import FacultyDashboard from './pages/faculty/Dashboard'
@@ -59,11 +63,12 @@ function AppRoutes() {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+    <Routes>
         {/* Public */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/dashboard" element={<RoleRoute />} />
 
         {/* Student */}
@@ -85,6 +90,11 @@ function AppRoutes() {
         <Route path="/student/ai" element={
           <ProtectedRoute requiredRole="student">
             <AIPage onLogout={handleLogout} />
+          </ProtectedRoute>
+        } />
+        <Route path="/student/materials" element={
+          <ProtectedRoute requiredRole="student">
+            <MaterialsPage onLogout={handleLogout} />
           </ProtectedRoute>
         } />
 
@@ -155,7 +165,6 @@ function AppRoutes() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </AnimatePresence>
   )
 }
 

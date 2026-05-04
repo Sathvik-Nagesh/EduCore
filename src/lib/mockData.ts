@@ -398,3 +398,44 @@ Chapter 5: Network Security
 - Encryption: Symmetric (AES), Asymmetric (RSA)
 - VPN, SSL/TLS`,
 }
+
+// ============================================
+// STUDY MATERIALS (uploaded by faculty)
+// ============================================
+
+export interface StudyMaterial {
+  id: string
+  subjectId: string
+  subjectCode: string
+  title: string
+  description: string
+  fileType: 'pdf' | 'ppt' | 'doc' | 'video' | 'link'
+  fileSize: string
+  uploadedBy: string
+  uploadedAt: string
+  chapter: string
+  downloads: number
+  pages?: number
+}
+
+export const STUDY_MATERIALS: StudyMaterial[] = [
+  // DBMS
+  { id: 'm1',  subjectId: 'sub1', subjectCode: 'DBMS', title: 'Introduction to Databases', description: 'Overview of DBMS concepts, types of databases, and architecture.', fileType: 'pdf', fileSize: '2.4 MB', uploadedBy: 'Dr. Priya Sharma', uploadedAt: '2026-04-28', chapter: 'Chapter 1', downloads: 142, pages: 38 },
+  { id: 'm2',  subjectId: 'sub1', subjectCode: 'DBMS', title: 'Relational Model & SQL', description: 'Relational algebra, SQL queries, joins, and subqueries with examples.', fileType: 'pdf', fileSize: '3.1 MB', uploadedBy: 'Dr. Priya Sharma', uploadedAt: '2026-05-01', chapter: 'Chapter 2', downloads: 215, pages: 52 },
+  { id: 'm3',  subjectId: 'sub1', subjectCode: 'DBMS', title: 'Normalization Slides', description: '1NF through BCNF with worked examples for exam preparation.', fileType: 'ppt', fileSize: '1.8 MB', uploadedBy: 'Dr. Priya Sharma', uploadedAt: '2026-05-03', chapter: 'Chapter 3', downloads: 189 },
+  { id: 'm4',  subjectId: 'sub1', subjectCode: 'DBMS', title: 'Transaction Management', description: 'ACID properties, concurrency control, deadlock detection.', fileType: 'pdf', fileSize: '2.9 MB', uploadedBy: 'Dr. Priya Sharma', uploadedAt: '2026-05-03', chapter: 'Chapter 4', downloads: 97, pages: 44 },
+  // DSA
+  { id: 'm5',  subjectId: 'sub2', subjectCode: 'DSA', title: 'Arrays & Linked Lists', description: 'Fundamental data structures with time complexity analysis.', fileType: 'pdf', fileSize: '1.6 MB', uploadedBy: 'Prof. Rahul Mehta', uploadedAt: '2026-04-25', chapter: 'Chapter 1', downloads: 301, pages: 28 },
+  { id: 'm6',  subjectId: 'sub2', subjectCode: 'DSA', title: 'Trees & Graphs', description: 'BST, AVL trees, BFS, DFS — complete with animated diagrams.', fileType: 'ppt', fileSize: '4.2 MB', uploadedBy: 'Prof. Rahul Mehta', uploadedAt: '2026-04-30', chapter: 'Chapter 2', downloads: 276 },
+  { id: 'm7',  subjectId: 'sub2', subjectCode: 'DSA', title: 'Sorting Algorithms', description: 'QuickSort, MergeSort, HeapSort — derivations and complexity proofs.', fileType: 'pdf', fileSize: '2.0 MB', uploadedBy: 'Prof. Rahul Mehta', uploadedAt: '2026-05-02', chapter: 'Chapter 3', downloads: 198, pages: 34 },
+  // OS
+  { id: 'm8',  subjectId: 'sub3', subjectCode: 'OS', title: 'Process Scheduling', description: 'FCFS, SJF, Round Robin, Priority — with Gantt chart examples.', fileType: 'pdf', fileSize: '2.2 MB', uploadedBy: 'Dr. Priya Sharma', uploadedAt: '2026-04-27', chapter: 'Chapter 2', downloads: 163, pages: 40 },
+  { id: 'm9',  subjectId: 'sub3', subjectCode: 'OS', title: 'Memory Management', description: 'Paging, segmentation, virtual memory, and page replacement policies.', fileType: 'ppt', fileSize: '3.5 MB', uploadedBy: 'Dr. Priya Sharma', uploadedAt: '2026-05-01', chapter: 'Chapter 3', downloads: 144 },
+  { id: 'm10', subjectId: 'sub3', subjectCode: 'OS', title: 'Deadlock Avoidance', description: "Banker's algorithm, resource allocation graphs — complete notes.", fileType: 'pdf', fileSize: '1.4 MB', uploadedBy: 'Dr. Priya Sharma', uploadedAt: '2026-05-03', chapter: 'Chapter 4', downloads: 211, pages: 22 },
+  // CN
+  { id: 'm11', subjectId: 'sub4', subjectCode: 'CN',   title: 'OSI & TCP/IP Models',  description: 'Layer-by-layer breakdown with real-world protocol mapping.', fileType: 'pdf', fileSize: '2.7 MB', uploadedBy: 'Dr. Anita Rao', uploadedAt: '2026-04-26', chapter: 'Chapter 1', downloads: 188, pages: 36 },
+  { id: 'm12', subjectId: 'sub4', subjectCode: 'CN',   title: 'Routing Protocols',    description: 'RIP, OSPF, BGP — configuration examples and comparison.', fileType: 'ppt', fileSize: '2.3 MB', uploadedBy: 'Dr. Anita Rao', uploadedAt: '2026-05-02', chapter: 'Chapter 4', downloads: 122 },
+  // ML
+  { id: 'm13', subjectId: 'sub5', subjectCode: 'ML',   title: 'Linear Regression',   description: 'Gradient descent, cost function, regularization — with Python code.', fileType: 'pdf', fileSize: '3.8 MB', uploadedBy: 'Prof. Rahul Mehta', uploadedAt: '2026-04-29', chapter: 'Chapter 2', downloads: 334, pages: 58 },
+  { id: 'm14', subjectId: 'sub5', subjectCode: 'ML',   title: 'Neural Networks Intro', description: 'Perceptron, activation functions, backpropagation explained visually.', fileType: 'ppt', fileSize: '5.1 MB', uploadedBy: 'Prof. Rahul Mehta', uploadedAt: '2026-05-03', chapter: 'Chapter 5', downloads: 412 },
+]
